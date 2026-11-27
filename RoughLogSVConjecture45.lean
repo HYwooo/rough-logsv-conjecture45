@@ -2,7 +2,7 @@
   RoughLogSVConjecture45.lean
   ==============================================================================
   Structured Lean 4 + Mathlib4 formalization of the proof of Conjecture 4.5 of
-  Sepp & Rakhmonov (2026), arXiv:2611.32791v1, following Huayang Wu (2026):
+  Sepp & Rakhmonov (2026), arXiv:2611.32791v1, following Gemini 4 Neon and Huayang WU (2026):
   "Proof of the Martingale Necessity Conjecture for Rough Log-Normal Stochastic
    Volatility with Quadratic Drift".
 

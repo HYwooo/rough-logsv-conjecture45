@@ -3,6 +3,7 @@
 #show: arkheion.with(
   title: "Proof of the Martingale Necessity Conjecture for Rough Log-Normal Stochastic Volatility with Quadratic Drift",
   authors: (
+    (name: "Gemini 4 Neon", email: "", affiliation: ""),
     (name: "Huayang WU", email: "huayang.bryan.wu[at]outlook.com", affiliation: ""),
   ),
   abstract: [

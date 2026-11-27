@@ -1,6 +1,6 @@
 # Proof of the Martingale Necessity Conjecture for Rough Log-Normal Stochastic Volatility with Quadratic Drift
 
-**Author:** Huayang WU (`huayang.bryan.wu[at]outlook.com`)  
+**Authors:** Gemini 4 Neon, Huayang WU (`huayang.bryan.wu[at]outlook.com`)  
 **Paper PDF:** [`paper/RoughLogSV_Conjecture45.pdf`](paper/RoughLogSV_Conjecture45.pdf)  
 **Typst Source:** [`paper/rough_logsv_conjecture_4_5.typ`](paper/rough_logsv_conjecture_4_5.typ) & [`paper/bibliography.bib`](paper/bibliography.bib)  
 **Lean 4 + Mathlib4 Verification:** [`RoughLogSVConjecture45.lean`](RoughLogSVConjecture45.lean) (Lean `v4.36.0`, Mathlib `v4.36.0`, zero `sorry`)
