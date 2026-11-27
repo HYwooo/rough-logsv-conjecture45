@@ -1,3 +1,4 @@
+# Lean / Lake & OS
 /.lake/
 /build/
 *.olean
@@ -6,3 +7,17 @@
 *.log
 .DS_Store
 Thumbs.db
+
+# Agent & local workspace files
+AGENTS.md
+PROJECT.md
+CLAUDE.md
+GEMINI.md
+.claude/
+.codex/
+.gemini/
+.agent/
+.cursor/
+.vscode/
+*.local.md
+*.scratch.*
