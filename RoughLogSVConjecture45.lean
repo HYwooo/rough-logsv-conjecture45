@@ -30,6 +30,11 @@
   * Layer 3 (End-to-End Main Theorem `conjecture_4_5`):
       Combines Layer 1 and Layer 2 with zero `sorry` to derive `E_Q[S_T] < S_0`
       for all `T > 0`, `H ∈ (0, 1/2]`, `σ₀ > 0`, `κ₁ ≥ 0`, `κ₂ ≥ 0`, `θ ≥ 0`, `β > κ₂`.
+  * Section 4 (General Kernels with Non-Negative First-Kind Resolvent — Theorem 3):
+      Follows the same 3-layer separation for arbitrary `K ∈ L²([0, T])` admitting
+      a finite non-negative first-kind resolvent measure `L` on `[0, T]`, proving
+      structural bounds (i)–(iii) (Eqs. 25–30) unconditionally in Layer 1 and deriving
+      `E_Q[S_T] < S_0` in `general_kernel_theorem_3`.
 -/
 
 import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
@@ -806,5 +811,654 @@ theorem conjecture_4_5 (p : ModelParams) (I : VolterraMartingaleInterface p) :
 
 end Layer3MainTheorem
 
+/-! ## Section 4: General Kernels with Non-Negative First-Kind Resolvent (Theorem 3) -/
+
+section Theorem3GeneralKernels
+
+/-- Admissible parameters for Theorem 3 (arbitrary kernel with non-negative finite
+    first-kind resolvent measure `L` on `[0, T]`). -/
+structure GeneralKernelParams where
+  σ₀ : ℝ
+  κ₁ : ℝ
+  κ₂ : ℝ
+  θ : ℝ
+  β : ℝ
+  ε : ℝ
+  T : ℝ
+  L : Measure ℝ
+  K : ℝ → ℝ
+  hσ₀_pos : 0 < σ₀
+  hκ₁_nonneg : 0 ≤ κ₁
+  hκ₂_nonneg : 0 ≤ κ₂
+  hθ_nonneg : 0 ≤ θ
+  hβ_gt_κ₂ : κ₂ < β
+  hT_pos : 0 < T
+  hL_fin : L (Icc 0 T) ≠ ⊤
+  /-- `(K * L)(t) = 1` a.e. on `(0, T]` guarantees a point `t ∈ (0, T / 2]` where
+      `∫ r in Icc 0 t, K (t - r) ∂L = 1` (hence `L [0, T/2] > 0`). -/
+  hKL_pos : ∃ t ∈ Ioo 0 (T / 2), (∫ r in Icc 0 t, K (t - r) ∂L) = 1
+
+namespace GeneralKernelParams
+
+def q (g : GeneralKernelParams) : ℝ := g.β - g.κ₂
+def ϑ (g : GeneralKernelParams) : ℝ := Real.sqrt (g.β ^ 2 + g.ε ^ 2)
+def c₀ (g : GeneralKernelParams) : ℝ := g.κ₁ * g.θ
+def c₁ (g : GeneralKernelParams) : ℝ := g.κ₂ * g.θ - g.κ₁
+def lam (g : GeneralKernelParams) : ℝ := g.q / (g.ϑ ^ 2 * g.T ^ 2)
+def A_M (g : GeneralKernelParams) (M : ℝ) : ℝ := g.c₁ + g.ϑ * M
+
+lemma q_pos (g : GeneralKernelParams) : 0 < g.q := by
+  unfold q; linarith [g.hβ_gt_κ₂]
+
+lemma β_pos (g : GeneralKernelParams) : 0 < g.β := by
+  linarith [g.hκ₂_nonneg, g.hβ_gt_κ₂]
+
+lemma ϑ_pos (g : GeneralKernelParams) : 0 < g.ϑ := by
+  unfold ϑ
+  apply Real.sqrt_pos.mpr
+  have hβ : 0 < g.β ^ 2 := sq_pos_of_pos g.β_pos
+  have hε : 0 ≤ g.ε ^ 2 := sq_nonneg g.ε
+  linarith
+
+lemma c₀_nonneg (g : GeneralKernelParams) : 0 ≤ g.c₀ :=
+  mul_nonneg g.hκ₁_nonneg g.hθ_nonneg
+
+lemma lam_pos (g : GeneralKernelParams) : 0 < g.lam := by
+  unfold lam
+  exact div_pos g.q_pos (mul_pos (sq_pos_of_pos g.ϑ_pos) (sq_pos_of_pos g.hT_pos))
+
+/-- Induced quadratic kernel weight `W₂(s) = 2 ∫_{[0, T - s]} (T - s - r) L(dr)` (Eq. 25). -/
+def W₂ (g : GeneralKernelParams) (s : ℝ) : ℝ :=
+  2 * ∫ r in Icc 0 (g.T - s), (g.T - s - r) ∂g.L
+
+/-- Total mass `I₀(T) = ∫_0^T W₂(s) ds`. -/
+def I₀ (g : GeneralKernelParams) : ℝ :=
+  ∫ s in (0 : ℝ)..g.T, g.W₂ s
+
+/-- Uniform main-interval upper bound `2 L([0, T]) / δ` (Eq. 26). -/
+def B_bound (g : GeneralKernelParams) (δ : ℝ) : ℝ :=
+  2 * g.L.real (Icc 0 g.T) / δ
+
+/-- Endpoint layer tail `Tail(δ) = ∫_{T-δ}^T W₂(s)^2 / (2 q (T - s)^2) ds` (Eq. 27). -/
+def tail (g : GeneralKernelParams) (δ : ℝ) : ℝ :=
+  ∫ s in (g.T - δ)..g.T, (g.W₂ s) ^ 2 / (2 * g.q * (g.T - s) ^ 2)
+
+lemma L_fin_subset (g : GeneralKernelParams) {A : Set ℝ} (hA : A ⊆ Icc 0 g.T) :
+    g.L A ≠ ⊤ :=
+  ne_top_of_le_ne_top g.hL_fin (measure_mono hA)
+
+lemma L_real_mono (g : GeneralKernelParams) {A B : Set ℝ} (hAB : A ⊆ B) (hB : B ⊆ Icc 0 g.T) :
+    g.L.real A ≤ g.L.real B :=
+  ENNReal.toReal_mono (g.L_fin_subset hB) (measure_mono hAB)
+
+lemma L_half_pos (g : GeneralKernelParams) : 0 < g.L.real (Icc 0 (g.T / 2)) := by
+  obtain ⟨t, ht, hInt⟩ := g.hKL_pos
+  have hsub : Icc 0 t ⊆ Icc 0 (g.T / 2) := Icc_subset_Icc_right (le_of_lt ht.2)
+  have hsubT : Icc 0 (g.T / 2) ⊆ Icc 0 g.T := Icc_subset_Icc_right (by linarith [g.hT_pos])
+  by_contra hle
+  push Not at hle
+  have hzero_half : g.L.real (Icc 0 (g.T / 2)) = 0 := le_antisymm hle ENNReal.toReal_nonneg
+  have hzero_t : g.L.real (Icc 0 t) = 0 :=
+    le_antisymm ((g.L_real_mono hsub hsubT).trans_eq hzero_half) ENNReal.toReal_nonneg
+  have hm_t : g.L (Icc 0 t) = 0 :=
+    (ENNReal.toReal_eq_zero_iff (g.L (Icc 0 t))).mp hzero_t |>.resolve_right
+      (g.L_fin_subset (hsub.trans hsubT))
+  have hzero_int : (∫ r in Icc 0 t, g.K (t - r) ∂g.L) = 0 := by
+    simp [MeasureTheory.Measure.restrict_eq_zero.mpr hm_t]
+  linarith
+
+private lemma integrableOn_continuous_Icc (g : GeneralKernelParams) {b : ℝ} (hb : b ≤ g.T)
+    {f : ℝ → ℝ} (hf : Continuous f) :
+    IntegrableOn f (Icc 0 b) g.L := by
+  have hfin : g.L (Icc 0 b) < ⊤ :=
+    lt_top_iff_ne_top.mpr (g.L_fin_subset (Icc_subset_Icc_right hb))
+  obtain ⟨C, hC⟩ := isCompact_Icc.exists_bound_of_continuousOn (s := Icc 0 b) hf.continuousOn
+  exact MeasureTheory.IntegrableOn.of_bound hfin hf.aestronglyMeasurable C
+    (ae_restrict_of_forall_mem measurableSet_Icc hC)
+
+lemma W₂_eq_Icc_T (g : GeneralKernelParams) {s : ℝ} (hs : s ∈ Icc 0 g.T) :
+    g.W₂ s = 2 * ∫ r in Icc 0 g.T, max (g.T - s - r) 0 ∂g.L := by
+  unfold W₂
+  congr 1
+  have hsub : Icc 0 (g.T - s) ⊆ Icc 0 g.T := Icc_subset_Icc_right (by linarith [hs.1])
+  have hIntT : IntegrableOn (fun r => max (g.T - s - r) 0) (Icc 0 g.T) g.L :=
+    g.integrableOn_continuous_Icc le_rfl ((continuous_const.sub continuous_id).max continuous_const)
+  have hSplit :
+      (∫ r in Icc 0 g.T, max (g.T - s - r) 0 ∂g.L) =
+        (∫ r in Icc 0 (g.T - s), max (g.T - s - r) 0 ∂g.L) +
+        (∫ r in Icc 0 g.T \ Icc 0 (g.T - s), max (g.T - s - r) 0 ∂g.L) := by
+    rw [← MeasureTheory.setIntegral_union disjoint_sdiff_self_right
+      (measurableSet_Icc.diff measurableSet_Icc)
+      (hIntT.mono_set hsub) (hIntT.mono_set sdiff_subset)]
+    rw [union_sdiff_cancel hsub]
+  have hFirst :
+      (∫ r in Icc 0 (g.T - s), max (g.T - s - r) 0 ∂g.L) =
+        ∫ r in Icc 0 (g.T - s), (g.T - s - r) ∂g.L := by
+    apply MeasureTheory.setIntegral_congr_fun measurableSet_Icc
+    intro r hr
+    exact max_eq_left (sub_nonneg.mpr hr.2)
+  have hSecond : (∫ r in Icc 0 g.T \ Icc 0 (g.T - s), max (g.T - s - r) 0 ∂g.L) = 0 := by
+    apply MeasureTheory.setIntegral_eq_zero_of_forall_eq_zero
+    intro r hr
+    have hgt : g.T - s < r := by
+      by_contra hle
+      push Not at hle
+      exact hr.2 ⟨hr.1.1, hle⟩
+    exact max_eq_right (by linarith)
+  rw [hSplit, hFirst, hSecond, add_zero]
+
+lemma W₂_nonneg (g : GeneralKernelParams) (s : ℝ) : 0 ≤ g.W₂ s := by
+  unfold W₂
+  apply mul_nonneg (by norm_num)
+  apply MeasureTheory.setIntegral_nonneg measurableSet_Icc
+  intro r hr
+  linarith [hr.2]
+
+lemma W₂_continuousOn (g : GeneralKernelParams) : ContinuousOn g.W₂ (Icc 0 g.T) := by
+  rw [Metric.continuousOn_iff]
+  intro s hs ε hε
+  set C : ℝ := 2 * g.L.real (Icc 0 g.T) + 1
+  have hC_pos : 0 < C := by
+    have : 0 ≤ g.L.real (Icc 0 g.T) := ENNReal.toReal_nonneg
+    linarith
+  refine ⟨ε / C, div_pos hε hC_pos, fun s' hs' hdist => ?_⟩
+  have hInt1 : IntegrableOn (fun r => max (g.T - s' - r) 0) (Icc 0 g.T) g.L :=
+    g.integrableOn_continuous_Icc le_rfl ((continuous_const.sub continuous_id).max continuous_const)
+  have hInt2 : IntegrableOn (fun r => max (g.T - s - r) 0) (Icc 0 g.T) g.L :=
+    g.integrableOn_continuous_Icc le_rfl ((continuous_const.sub continuous_id).max continuous_const)
+  have hPt : ∀ r ∈ Icc 0 g.T, |max (g.T - s' - r) 0 - max (g.T - s - r) 0| ≤ dist s' s := by
+    intro r _
+    rw [Real.dist_eq, abs_sub_le_iff]
+    constructor
+    · have h1 : max (g.T - s' - r) 0 ≤ max (g.T - s - r) 0 + |s' - s| := by
+        refine max_le ?_ (add_nonneg (le_max_right _ _) (abs_nonneg _))
+        have h2 : g.T - s' - r ≤ (g.T - s - r) + |s' - s| := by
+          have := neg_le_abs (s' - s)
+          linarith
+        linarith [le_max_left (g.T - s - r) (0 : ℝ)]
+      linarith
+    · have h1 : max (g.T - s - r) 0 ≤ max (g.T - s' - r) 0 + |s' - s| := by
+        refine max_le ?_ (add_nonneg (le_max_right _ _) (abs_nonneg _))
+        have h2 : g.T - s - r ≤ (g.T - s' - r) + |s' - s| := by
+          have := le_abs_self (s' - s)
+          linarith
+        linarith [le_max_left (g.T - s' - r) (0 : ℝ)]
+      linarith
+  have hNorm :
+      |∫ r in Icc 0 g.T, (max (g.T - s' - r) 0 - max (g.T - s - r) 0) ∂g.L| ≤
+        ∫ _ in Icc 0 g.T, dist s' s ∂g.L := by
+    rw [← Real.norm_eq_abs]
+    refine le_trans (MeasureTheory.norm_integral_le_integral_norm _) ?_
+    apply MeasureTheory.setIntegral_mono_on
+    · exact (hInt1.sub hInt2).norm
+    · exact g.integrableOn_continuous_Icc le_rfl continuous_const
+    · exact measurableSet_Icc
+    · intro r hr
+      simpa [Real.norm_eq_abs] using hPt r hr
+  have hConst : (∫ _ in Icc 0 g.T, dist s' s ∂g.L) = g.L.real (Icc 0 g.T) * dist s' s := by
+    simp [smul_eq_mul]
+  rw [Real.dist_eq, g.W₂_eq_Icc_T hs', g.W₂_eq_Icc_T hs, ← mul_sub, ← integral_sub hInt1 hInt2]
+  rw [abs_mul, abs_of_pos (by norm_num : (0 : ℝ) < 2)]
+  have hBound :
+      2 * |∫ r in Icc 0 g.T, (max (g.T - s' - r) 0 - max (g.T - s - r) 0) ∂g.L| ≤
+        2 * g.L.real (Icc 0 g.T) * dist s' s := by
+    have := mul_le_mul_of_nonneg_left (hNorm.trans_eq hConst) (by norm_num : (0 : ℝ) ≤ 2)
+    linarith
+  have hLt : 2 * g.L.real (Icc 0 g.T) * dist s' s < ε := by
+    have hL_nonneg : 0 ≤ g.L.real (Icc 0 g.T) := ENNReal.toReal_nonneg
+    have hDist_nonneg : 0 ≤ dist s' s := dist_nonneg
+    have hProd : 2 * g.L.real (Icc 0 g.T) * dist s' s ≤ (2 * g.L.real (Icc 0 g.T) + 1) * dist s' s := by
+      nlinarith
+    have hC_dist : C * dist s' s < ε := by
+      have := (lt_div_iff₀' hC_pos).mp hdist
+      simpa [C] using this
+    exact lt_of_le_of_lt hProd hC_dist
+  exact lt_of_le_of_lt hBound hLt
+
+/-- **Eq. (29) Uniform Weight Upper Bound**:
+    For all `s ∈ [0, T]`, `W₂(s) ≤ 2 (T - s) L([0, T - s])`. -/
+lemma W₂_le (g : GeneralKernelParams) {s : ℝ} (hs : s ∈ Icc 0 g.T) :
+    g.W₂ s ≤ 2 * (g.T - s) * g.L.real (Icc 0 (g.T - s)) := by
+  unfold W₂
+  have hMono :
+      (∫ r in Icc 0 (g.T - s), (g.T - s - r) ∂g.L) ≤
+        ∫ _ in Icc 0 (g.T - s), (g.T - s) ∂g.L := by
+    apply MeasureTheory.setIntegral_mono_on
+      (g.integrableOn_continuous_Icc (by linarith [hs.1]) (continuous_const.sub continuous_id))
+      (g.integrableOn_continuous_Icc (by linarith [hs.1]) continuous_const) measurableSet_Icc
+    intro r hr
+    dsimp
+    linarith [hr.1]
+  have hConst : (∫ _ in Icc 0 (g.T - s), (g.T - s) ∂g.L) = g.L.real (Icc 0 (g.T - s)) * (g.T - s) := by
+    simp [smul_eq_mul]
+  linarith
+
+/-- **Eq. (28) Lower Bound on `[0, T / 4]`**:
+    For `s ∈ [0, T / 4]`, `(T / 2) L([0, T / 2]) ≤ W₂(s)`. -/
+lemma W₂_lower_half (g : GeneralKernelParams) {s : ℝ} (hs : s ∈ Icc 0 (g.T / 4)) :
+    (g.T / 2) * g.L.real (Icc 0 (g.T / 2)) ≤ g.W₂ s := by
+  unfold W₂
+  have hsT : s ∈ Icc 0 g.T := ⟨hs.1, by linarith [hs.2, g.hT_pos]⟩
+  have hsub : Icc 0 (g.T / 2) ⊆ Icc 0 (g.T - s) := Icc_subset_Icc_right (by linarith [hs.2, g.hT_pos])
+  have hIntW : IntegrableOn (fun r => g.T - s - r) (Icc 0 (g.T - s)) g.L :=
+    g.integrableOn_continuous_Icc (by linarith [hsT.1]) (continuous_const.sub continuous_id)
+  have hMonoSet :
+      (∫ r in Icc 0 (g.T / 2), (g.T - s - r) ∂g.L) ≤
+        ∫ r in Icc 0 (g.T - s), (g.T - s - r) ∂g.L := by
+    apply MeasureTheory.setIntegral_mono_set hIntW
+    · filter_upwards [ae_restrict_mem measurableSet_Icc] with r hr
+      exact sub_nonneg.mpr hr.2
+    · exact Eventually.of_forall (fun r hr => hsub hr)
+  have hMonoOn :
+      (∫ _ in Icc 0 (g.T / 2), (g.T / 4) ∂g.L) ≤
+        ∫ r in Icc 0 (g.T / 2), (g.T - s - r) ∂g.L := by
+    apply MeasureTheory.setIntegral_mono_on
+      (g.integrableOn_continuous_Icc (by linarith [g.hT_pos]) continuous_const)
+      (hIntW.mono_set hsub) measurableSet_Icc
+    intro r hr
+    linarith [hs.2, hr.2]
+  have hConst : (∫ _ in Icc 0 (g.T / 2), (g.T / 4) ∂g.L) = g.L.real (Icc 0 (g.T / 2)) * (g.T / 4) := by
+    simp [smul_eq_mul]
+  linarith
+
+/-- **Theorem 3(1)(i)**: `I₀(T) ≥ (T^2 / 8) L([0, T/2]) > 0`. -/
+lemma I₀_pos (g : GeneralKernelParams) : 0 < g.I₀ := by
+  unfold I₀
+  have hT_nonneg : 0 ≤ g.T := le_of_lt g.hT_pos
+  have hT4_nonneg : 0 ≤ g.T / 4 := by linarith [g.hT_pos]
+  have hT4_le : g.T / 4 ≤ g.T := by linarith [g.hT_pos]
+  have hInt1 : IntervalIntegrable g.W₂ volume 0 (g.T / 4) := by
+    apply g.W₂_continuousOn.mono _ |>.intervalIntegrable
+    rw [uIcc_of_le hT4_nonneg]
+    exact Icc_subset_Icc_right hT4_le
+  have hInt2 : IntervalIntegrable g.W₂ volume (g.T / 4) g.T := by
+    apply g.W₂_continuousOn.mono _ |>.intervalIntegrable
+    rw [uIcc_of_le hT4_le]
+    exact Icc_subset_Icc_left hT4_nonneg
+  rw [← intervalIntegral.integral_add_adjacent_intervals hInt1 hInt2]
+  have hFirst : (g.T ^ 2 / 8) * g.L.real (Icc 0 (g.T / 2)) ≤ ∫ s in (0 : ℝ)..(g.T / 4), g.W₂ s := by
+    have hConstInt :
+        (∫ _ in (0 : ℝ)..(g.T / 4), (g.T / 2) * g.L.real (Icc 0 (g.T / 2))) =
+          (g.T ^ 2 / 8) * g.L.real (Icc 0 (g.T / 2)) := by
+      rw [intervalIntegral.integral_const, sub_zero, smul_eq_mul]
+      ring
+    rw [← hConstInt]
+    apply intervalIntegral.integral_mono_on hT4_nonneg intervalIntegrable_const hInt1
+    intro s hs
+    exact g.W₂_lower_half hs
+  have hSecond : 0 ≤ ∫ s in (g.T / 4)..g.T, g.W₂ s := by
+    apply intervalIntegral.integral_nonneg hT4_le
+    intro s _
+    exact g.W₂_nonneg s
+  have hLower_pos : 0 < (g.T ^ 2 / 8) * g.L.real (Icc 0 (g.T / 2)) :=
+    mul_pos (div_pos (sq_pos_of_pos g.hT_pos) (by norm_num)) g.L_half_pos
+  linarith
+
+/-- **Theorem 3(1)(ii)**: On `[0, T - δ]`, `W₂(s) ≤ B_bound(δ) (T - s)^2`. -/
+lemma B_bound_valid (g : GeneralKernelParams) {δ s : ℝ} (hδ : δ ∈ Ioo 0 g.T)
+    (hs0 : 0 ≤ s) (hsδ : s ≤ g.T - δ) :
+    g.W₂ s ≤ g.B_bound δ * (g.T - s) ^ 2 := by
+  have hsT : s ∈ Icc 0 g.T := ⟨hs0, by linarith [hδ.1]⟩
+  have hW := g.W₂_le hsT
+  have hLmono : g.L.real (Icc 0 (g.T - s)) ≤ g.L.real (Icc 0 g.T) :=
+    g.L_real_mono (Icc_subset_Icc_right (by linarith)) Subset.rfl
+  have hTus : δ ≤ g.T - s := by linarith
+  have hTu_nonneg : 0 ≤ g.T - s := le_trans (le_of_lt hδ.1) hTus
+  have h2_le : 2 * (g.T - s) * g.L.real (Icc 0 (g.T - s)) ≤ 2 * (g.T - s) * g.L.real (Icc 0 g.T) :=
+    mul_le_mul_of_nonneg_left hLmono (by linarith)
+  have hB : 2 * (g.T - s) * g.L.real (Icc 0 g.T) ≤ g.B_bound δ * (g.T - s) ^ 2 := by
+    unfold B_bound
+    have hδ_pos : 0 < δ := hδ.1
+    have hL_nonneg : 0 ≤ g.L.real (Icc 0 g.T) := ENNReal.toReal_nonneg
+    have h1 : 2 * (g.T - s) * g.L.real (Icc 0 g.T) * δ ≤ 2 * g.L.real (Icc 0 g.T) * (g.T - s) ^ 2 := by
+      have : (g.T - s) * δ ≤ (g.T - s) ^ 2 := by nlinarith
+      nlinarith
+    rw [div_mul_eq_mul_div, le_div_iff₀ hδ_pos]
+    linarith
+  exact hW.trans (h2_le.trans hB)
+
+/-- **Eq. (30) & Theorem 3(1)(iii)**:
+    `Tail(δ)` is integrable and bounded by `(2 L([0, T])^2 / q) * δ`. -/
+lemma integrable_tail (g : GeneralKernelParams) {δ : ℝ} (hδ : δ ∈ Ioo 0 g.T) :
+    IntervalIntegrable (fun s => (g.W₂ s) ^ 2 / (2 * g.q * (g.T - s) ^ 2)) volume (g.T - δ) g.T := by
+  have hle : g.T - δ ≤ g.T := by linarith [hδ.1]
+  rw [intervalIntegrable_iff_integrableOn_Ioc_of_le hle]
+  have hIoo_ae : Ioo (g.T - δ) g.T =ᵐ[volume] Ioc (g.T - δ) g.T := Ioo_ae_eq_Ioc
+  rw [← MeasureTheory.integrableOn_congr_set_ae hIoo_ae]
+  have hCont : ContinuousOn (fun s => (g.W₂ s) ^ 2 / (2 * g.q * (g.T - s) ^ 2)) (Ioo (g.T - δ) g.T) := by
+    apply ContinuousOn.div
+    · exact (g.W₂_continuousOn.mono
+        (show Ioo (g.T - δ) g.T ⊆ Icc 0 g.T from
+          fun s hs => ⟨by linarith [hs.1, hδ.2], le_of_lt hs.2⟩)).pow 2
+    · exact continuousOn_const.mul ((continuousOn_const.sub continuousOn_id).pow 2)
+    · intro s hs
+      exact mul_ne_zero (mul_ne_zero (by norm_num : (2 : ℝ) ≠ 0) (ne_of_gt g.q_pos))
+        (pow_ne_zero 2 (ne_of_gt (sub_pos.mpr hs.2)))
+  have hMeas : AEStronglyMeasurable (fun s => (g.W₂ s) ^ 2 / (2 * g.q * (g.T - s) ^ 2))
+      (volume.restrict (Ioo (g.T - δ) g.T)) :=
+    hCont.aestronglyMeasurable measurableSet_Ioo
+  refine MeasureTheory.IntegrableOn.of_bound measure_Ioo_lt_top hMeas
+    (2 * (g.L.real (Icc 0 g.T)) ^ 2 / g.q) ?_
+  filter_upwards [ae_restrict_mem measurableSet_Ioo] with s hs
+  have hsT : s ∈ Icc 0 g.T := ⟨by linarith [hs.1, hδ.2], le_of_lt hs.2⟩
+  have hTu_pos : 0 < g.T - s := sub_pos.mpr hs.2
+  have hW_nonneg : 0 ≤ g.W₂ s := g.W₂_nonneg s
+  have hW_le : g.W₂ s ≤ 2 * (g.T - s) * g.L.real (Icc 0 g.T) := by
+    have := g.W₂_le hsT
+    have hLm : g.L.real (Icc 0 (g.T - s)) ≤ g.L.real (Icc 0 g.T) :=
+      g.L_real_mono (Icc_subset_Icc_right (by linarith [hsT.1])) Subset.rfl
+    nlinarith
+  have hVal_nonneg : 0 ≤ (g.W₂ s) ^ 2 / (2 * g.q * (g.T - s) ^ 2) := by
+    have := g.q_pos; positivity
+  rw [Real.norm_of_nonneg hVal_nonneg]
+  have hSq : (g.W₂ s) ^ 2 ≤ 4 * (g.T - s) ^ 2 * (g.L.real (Icc 0 g.T)) ^ 2 := by nlinarith
+  have hDen_pos : 0 < 2 * g.q * (g.T - s) ^ 2 := mul_pos (mul_pos (by norm_num) g.q_pos) (sq_pos_of_pos hTu_pos)
+  rw [div_le_div_iff₀ hDen_pos g.q_pos]
+  nlinarith [sq_pos_of_pos hTu_pos]
+
+lemma tail_le (g : GeneralKernelParams) {δ : ℝ} (hδ : δ ∈ Ioo 0 g.T) :
+    g.tail δ ≤ (2 * (g.L.real (Icc 0 g.T)) ^ 2 / g.q) * δ := by
+  unfold tail
+  have hle : g.T - δ ≤ g.T := by linarith [hδ.1]
+  have hInt := g.integrable_tail hδ
+  have hConstInt :
+      (∫ _ in (g.T - δ)..g.T, (2 * (g.L.real (Icc 0 g.T)) ^ 2 / g.q)) =
+        (2 * (g.L.real (Icc 0 g.T)) ^ 2 / g.q) * δ := by
+    rw [intervalIntegral.integral_const, sub_sub_cancel, smul_eq_mul]
+    ring
+  rw [← hConstInt]
+  apply intervalIntegral.integral_mono_on hle hInt intervalIntegrable_const
+  intro s hs
+  rcases eq_or_lt_of_le hs.2 with rfl | hs_lt
+  · simp only [sub_self, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, mul_zero, div_zero]
+    have hq_nonneg : 0 ≤ g.q := le_of_lt g.q_pos
+    positivity
+  · have hsT : s ∈ Icc 0 g.T := ⟨by linarith [hs.1, hδ.2], le_of_lt hs_lt⟩
+    have hTu_pos : 0 < g.T - s := sub_pos.mpr hs_lt
+    have hW_nonneg : 0 ≤ g.W₂ s := g.W₂_nonneg s
+    have hW_le : g.W₂ s ≤ 2 * (g.T - s) * g.L.real (Icc 0 g.T) := by
+      have := g.W₂_le hsT
+      have hLm : g.L.real (Icc 0 (g.T - s)) ≤ g.L.real (Icc 0 g.T) :=
+        g.L_real_mono (Icc_subset_Icc_right (by linarith [hsT.1])) Subset.rfl
+      nlinarith
+    have hSq : (g.W₂ s) ^ 2 ≤ 4 * (g.T - s) ^ 2 * (g.L.real (Icc 0 g.T)) ^ 2 := by nlinarith
+    have hDen_pos : 0 < 2 * g.q * (g.T - s) ^ 2 :=
+      mul_pos (mul_pos (by norm_num) g.q_pos) (sq_pos_of_pos hTu_pos)
+    rw [div_le_div_iff₀ hDen_pos g.q_pos]
+    nlinarith [sq_pos_of_pos hTu_pos]
+
+/-- **Eq. (34) Constructive Parameter Selection (`δ`, `M`)**:
+    There exist `δ ∈ (0, T)` and `M > 0` with `A_M ≥ B(δ)` and `Tail(δ) ≤ (1/2) σ₀ I₀(T)`. -/
+lemma exists_general_M_contradiction_margin (g : GeneralKernelParams) :
+    ∃ (δ M : ℝ), δ ∈ Ioo 0 g.T ∧ 0 < g.A_M M ∧ g.B_bound δ ≤ g.A_M M ∧
+      g.tail δ ≤ (1 / 2) * g.σ₀ * g.I₀ := by
+  set Ltot : ℝ := g.L.real (Icc 0 g.T)
+  set D : ℝ := 2 * Ltot ^ 2 / g.q + 1
+  have hD_pos : 0 < D := by
+    have hq := g.q_pos; positivity
+  set δ : ℝ := min (g.T / 2) ((1 / 2) * g.σ₀ * g.I₀ / D)
+  have hNum_pos : 0 < (1 / 2) * g.σ₀ * g.I₀ :=
+    mul_pos (mul_pos (by norm_num) g.hσ₀_pos) g.I₀_pos
+  have hδ_pos : 0 < δ := lt_min (by linarith [g.hT_pos]) (div_pos hNum_pos hD_pos)
+  have hδ_lt_T : δ < g.T := lt_of_le_of_lt (min_le_left _ _) (by linarith [g.hT_pos])
+  have hδ_mem : δ ∈ Ioo 0 g.T := ⟨hδ_pos, hδ_lt_T⟩
+  have hTail : g.tail δ ≤ (1 / 2) * g.σ₀ * g.I₀ := by
+    have h1 := g.tail_le hδ_mem
+    have hCoeff : 2 * Ltot ^ 2 / g.q ≤ D := by
+      dsimp only [D]; linarith
+    have h2 : (2 * Ltot ^ 2 / g.q) * δ ≤ D * δ := mul_le_mul_of_nonneg_right hCoeff (le_of_lt hδ_pos)
+    have hδ_le_frac : δ ≤ (1 / 2) * g.σ₀ * g.I₀ / D := min_le_right _ _
+    have h3 : D * δ ≤ (1 / 2) * g.σ₀ * g.I₀ := by
+      calc D * δ ≤ D * ((1 / 2) * g.σ₀ * g.I₀ / D) := mul_le_mul_of_nonneg_left hδ_le_frac (le_of_lt hD_pos)
+        _ = (1 / 2) * g.σ₀ * g.I₀ := mul_div_cancel₀ _ (ne_of_gt hD_pos)
+    exact h1.trans (h2.trans h3)
+  set targetA : ℝ := max 1 (g.B_bound δ)
+  set M : ℝ := (targetA - g.c₁) / g.ϑ
+  have hAM_eq : g.A_M M = targetA := by
+    dsimp only [A_M, M]
+    have hϑ_ne : g.ϑ ≠ 0 := ne_of_gt g.ϑ_pos
+    field_simp [hϑ_ne]; ring
+  have hAM_pos : 0 < g.A_M M := by
+    rw [hAM_eq]; exact lt_of_lt_of_le (by norm_num) (le_max_left _ _)
+  have hB_le : g.B_bound δ ≤ g.A_M M := by
+    rw [hAM_eq]; exact le_max_right _ _
+  exact ⟨δ, M, hδ_mem, hAM_pos, hB_le, hTail⟩
+
+/-- **Eq. (33)–(34) General Split-Integral Lower Bound**:
+    For continuous `σ ≥ 0` on `[0, T]`, `δ ∈ (0, T)`, and `B(δ) ≤ A_M`:
+    `-Tail(δ) ≤ ∫_0^T ((q/2)(T-u)^2 σ(u)^2 + (A_M (T-u)^2 - W₂(u)) σ(u)) du`. -/
+lemma general_split_integral_lower_bound (g : GeneralKernelParams) {δ M : ℝ}
+    (hδ : δ ∈ Ioo 0 g.T) (hA : 0 < g.A_M M) (hB : g.B_bound δ ≤ g.A_M M)
+    (σ : ℝ → ℝ) (hσ_cont : ContinuousOn σ (Icc 0 g.T))
+    (hσ_nonneg : ∀ u ∈ Icc 0 g.T, 0 ≤ σ u) :
+    -g.tail δ ≤
+      ∫ u in (0 : ℝ)..g.T,
+        ((g.q / 2) * (g.T - u) ^ 2 * (σ u) ^ 2 +
+          (g.A_M M * (g.T - u) ^ 2 - g.W₂ u) * σ u) := by
+  set f : ℝ → ℝ := fun u =>
+    (g.q / 2) * (g.T - u) ^ 2 * (σ u) ^ 2 + (g.A_M M * (g.T - u) ^ 2 - g.W₂ u) * σ u
+  have hT_nonneg : 0 ≤ g.T := le_of_lt g.hT_pos
+  have hTδ_nonneg : 0 ≤ g.T - δ := by linarith [hδ.2]
+  have hTδ_le : g.T - δ ≤ g.T := by linarith [hδ.1]
+  have hf_cont : ContinuousOn f (Icc 0 g.T) := by
+    have h1 : ContinuousOn (fun u => g.T - u) (Icc 0 g.T) := continuousOn_const.sub continuousOn_id
+    exact ((continuousOn_const.mul (h1.pow 2)).mul (hσ_cont.pow 2)).add
+      (((continuousOn_const.mul (h1.pow 2)).sub g.W₂_continuousOn).mul hσ_cont)
+  have hf1 : IntervalIntegrable f volume 0 (g.T - δ) :=
+    (hf_cont.mono (by rw [uIcc_of_le hTδ_nonneg]; exact Icc_subset_Icc_right hTδ_le)).intervalIntegrable
+  have hf2 : IntervalIntegrable f volume (g.T - δ) g.T :=
+    (hf_cont.mono (by rw [uIcc_of_le hTδ_le]; exact Icc_subset_Icc_left hTδ_nonneg)).intervalIntegrable
+  change -g.tail δ ≤ ∫ u in (0 : ℝ)..g.T, f u
+  rw [← intervalIntegral.integral_add_adjacent_intervals hf1 hf2]
+  have hMain : 0 ≤ ∫ u in (0 : ℝ)..(g.T - δ), f u := by
+    apply intervalIntegral.integral_nonneg hTδ_nonneg
+    intro u hu
+    have hW := g.B_bound_valid hδ hu.1 hu.2
+    have hCo : g.W₂ u ≤ g.A_M M * (g.T - u) ^ 2 :=
+      hW.trans (mul_le_mul_of_nonneg_right hB (sq_nonneg _))
+    have hQuad : 0 ≤ (g.q / 2) * (g.T - u) ^ 2 * (σ u) ^ 2 := by
+      have := le_of_lt g.q_pos; positivity
+    have hLin : 0 ≤ (g.A_M M * (g.T - u) ^ 2 - g.W₂ u) * σ u :=
+      mul_nonneg (sub_nonneg.mpr hCo) (hσ_nonneg u ⟨hu.1, hu.2.trans hTδ_le⟩)
+    exact add_nonneg hQuad hLin
+  have hEnd : -g.tail δ ≤ ∫ u in (g.T - δ)..g.T, f u := by
+    have hTailInt := g.integrable_tail hδ
+    have hNegInt :
+        -g.tail δ = ∫ u in (g.T - δ)..g.T, -((g.W₂ u) ^ 2 / (2 * g.q * (g.T - u) ^ 2)) := by
+      unfold tail
+      rw [intervalIntegral.integral_neg]
+    rw [hNegInt]
+    apply intervalIntegral.integral_mono_on hTδ_le hTailInt.neg hf2
+    intro u hu
+    rcases eq_or_lt_of_le hu.2 with rfl | hu_lt
+    · simp only [f, sub_self, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, mul_zero,
+        zero_sub]
+      -- At `u = T`, `W₂(T) = 0` so `f T = 0`.
+      have hWT : g.W₂ g.T = 0 := by
+        have h1 := g.W₂_le ⟨le_of_lt g.hT_pos, le_rfl⟩
+        have h2 := g.W₂_nonneg g.T
+        linarith
+      simp [hWT]
+    · have huT : u ∈ Icc 0 g.T := ⟨by linarith [hu.1, hδ.2], le_of_lt hu_lt⟩
+      have hTu_pos : 0 < g.T - u := sub_pos.mpr hu_lt
+      have hDrop : 0 ≤ g.A_M M * (g.T - u) ^ 2 * σ u :=
+        mul_nonneg (mul_nonneg (le_of_lt hA) (sq_nonneg _)) (hσ_nonneg u huT)
+      set a : ℝ := (g.q / 2) * (g.T - u) ^ 2
+      set b : ℝ := g.W₂ u
+      have ha_pos : 0 < a := by have := g.q_pos; positivity
+      have ha_ne : a ≠ 0 := ne_of_gt ha_pos
+      have hCS : -(b ^ 2 / (4 * a)) ≤ a * (σ u) ^ 2 - b * σ u := by
+        have hsq : 0 ≤ a * (σ u - b / (2 * a)) ^ 2 := mul_nonneg (le_of_lt ha_pos) (sq_nonneg _)
+        have hid : a * (σ u - b / (2 * a)) ^ 2 = a * (σ u) ^ 2 - b * σ u + b ^ 2 / (4 * a) := by
+          field_simp [ha_ne]; ring
+        linarith
+      have hEqDen : 4 * a = 2 * g.q * (g.T - u) ^ 2 := by dsimp only [a]; ring
+      have hRearr : f u = (a * (σ u) ^ 2 - b * σ u) + g.A_M M * (g.T - u) ^ 2 * σ u := by
+        dsimp only [f, a, b]; ring
+      simp only [Pi.neg_apply]
+      rw [hRearr, ← hEqDen]
+      change -(b ^ 2 / (4 * a)) ≤ _
+      linarith
+  linarith
+
+/-- Eq. (16) Quadratic-variation domination for `GeneralKernelParams`. -/
+lemma quadratic_variation_domination_general (g : GeneralKernelParams) (σ : ℝ → ℝ)
+    (hσ_cont : ContinuousOn σ (Icc 0 g.T)) :
+    (1 / 2) * g.lam ^ 2 * g.ϑ ^ 2 *
+        (∫ u in (0 : ℝ)..g.T, (g.T - u) ^ 4 * (σ u) ^ 2) ≤
+      (g.lam * g.q / 2) *
+        (∫ u in (0 : ℝ)..g.T, (g.T - u) ^ 2 * (σ u) ^ 2) := by
+  have hT_nonneg : 0 ≤ g.T := le_of_lt g.hT_pos
+  have hInt1 : IntervalIntegrable (fun u => (g.T - u) ^ 4 * (σ u) ^ 2) volume 0 g.T := by
+    apply ContinuousOn.intervalIntegrable
+    rw [uIcc_of_le hT_nonneg]
+    exact ((continuousOn_const.sub continuousOn_id).pow 4).mul (hσ_cont.pow 2)
+  have hInt2 : IntervalIntegrable (fun u => g.T ^ 2 * ((g.T - u) ^ 2 * (σ u) ^ 2)) volume 0 g.T := by
+    apply ContinuousOn.intervalIntegrable
+    rw [uIcc_of_le hT_nonneg]
+    exact continuousOn_const.mul (((continuousOn_const.sub continuousOn_id).pow 2).mul (hσ_cont.pow 2))
+  have hMono :
+      (∫ u in (0 : ℝ)..g.T, (g.T - u) ^ 4 * (σ u) ^ 2) ≤
+        g.T ^ 2 * (∫ u in (0 : ℝ)..g.T, (g.T - u) ^ 2 * (σ u) ^ 2) := by
+    rw [← intervalIntegral.integral_const_mul]
+    apply intervalIntegral.integral_mono_on hT_nonneg hInt1 hInt2
+    intro u hu
+    have h1 := quartic_le_sq_mul_sq hu.1 hu.2
+    have h2 : 0 ≤ (σ u) ^ 2 := sq_nonneg (σ u)
+    nlinarith
+  have hCoeff : (1 / 2) * g.lam ^ 2 * g.ϑ ^ 2 * g.T ^ 2 = g.lam * g.q / 2 := by
+    unfold lam
+    have hϑ : g.ϑ ≠ 0 := ne_of_gt g.ϑ_pos
+    have hT : g.T ≠ 0 := ne_of_gt g.hT_pos
+    field_simp [hϑ, hT]
+  have hFactor_nonneg : 0 ≤ (1 / 2) * g.lam ^ 2 * g.ϑ ^ 2 := by positivity
+  calc
+    (1 / 2) * g.lam ^ 2 * g.ϑ ^ 2 * (∫ u in (0 : ℝ)..g.T, (g.T - u) ^ 4 * (σ u) ^ 2)
+        ≤ (1 / 2) * g.lam ^ 2 * g.ϑ ^ 2 *
+            (g.T ^ 2 * (∫ u in (0 : ℝ)..g.T, (g.T - u) ^ 2 * (σ u) ^ 2)) :=
+          mul_le_mul_of_nonneg_left hMono hFactor_nonneg
+    _ = ((1 / 2) * g.lam ^ 2 * g.ϑ ^ 2 * g.T ^ 2) *
+          (∫ u in (0 : ℝ)..g.T, (g.T - u) ^ 2 * (σ u) ^ 2) := by ring
+    _ = (g.lam * g.q / 2) * (∫ u in (0 : ℝ)..g.T, (g.T - u) ^ 2 * (σ u) ^ 2) := by rw [hCoeff]
+
+end GeneralKernelParams
+
+/-- Layer 2 stochastic-calculus interface for **Theorem 3** (general `K ∈ L²([0, T])`
+    admitting a finite non-negative first-kind resolvent measure `L`). -/
+structure GeneralVolterraMartingaleInterface (g : GeneralKernelParams) where
+  Ω : Type*
+  E_S_T : ℝ
+  S₀ : ℝ
+  supermartingale_le : E_S_T ≤ S₀
+  tilted_system :
+    E_S_T = S₀ →
+    ∀ M : ℝ, 0 < g.A_M M →
+      ∃ (E_M : (Ω → ℝ) → ℝ) (σ : Ω → ℝ → ℝ) (M_T : Ω → ℝ) (Good : Set Ω),
+        (∀ ω ∈ Good, ContinuousOn (σ ω) (Icc 0 g.T) ∧ ∀ u ∈ Icc 0 g.T, 0 ≤ σ ω u) ∧
+        (∀ ω ∈ Good,
+          -M_T ω =
+            g.σ₀ * g.I₀ + g.c₀ * g.T ^ 3 / 3 +
+            ∫ s in (0 : ℝ)..g.T,
+              (g.q * (g.T - s) ^ 2 * (σ ω s) ^ 2 +
+                (g.A_M M * (g.T - s) ^ 2 - g.W₂ s) * σ ω s)) ∧
+        E_M (fun ω => Real.exp (-(g.lam * M_T ω) -
+            (1 / 2) * g.lam ^ 2 * g.ϑ ^ 2 *
+              (∫ u in (0 : ℝ)..g.T, (g.T - u) ^ 4 * (σ ω u) ^ 2))) ≤ 1 ∧
+        (∀ (c : ℝ) (X : Ω → ℝ), (∀ ω ∈ Good, c ≤ X ω) → c ≤ E_M X)
+
+/-- **Theorem 3 (Martingale Necessity for General Kernels with Non-Negative First-Kind Resolvent)**:
+    Under `GeneralKernelParams` and `GeneralVolterraMartingaleInterface`, `E_Q[S_T] < S_0`. -/
+theorem general_kernel_theorem_3 (g : GeneralKernelParams)
+    (I : GeneralVolterraMartingaleInterface g) : I.E_S_T < I.S₀ := by
+  refine lt_of_le_of_ne I.supermartingale_le ?_
+  intro hEq
+  obtain ⟨δ, M, hδ, hAM_pos, hB, hTail⟩ := g.exists_general_M_contradiction_margin
+  obtain ⟨E_M, σ, M_T, Good, hReg, hQuadTest, hDD, hMono⟩ := I.tilted_system hEq M hAM_pos
+  set ε₀ : ℝ := g.lam * ((1 / 2) * g.σ₀ * g.I₀)
+  have hε₀_pos : 0 < ε₀ :=
+    mul_pos g.lam_pos (mul_pos (mul_pos (by norm_num) g.hσ₀_pos) g.I₀_pos)
+  have hPathwise :
+      ∀ ω ∈ Good,
+        Real.exp ε₀ ≤
+          Real.exp (-(g.lam * M_T ω) -
+            (1 / 2) * g.lam ^ 2 * g.ϑ ^ 2 *
+              (∫ u in (0 : ℝ)..g.T, (g.T - u) ^ 4 * (σ ω u) ^ 2)) := by
+    intro ω hω
+    apply Real.exp_le_exp.mpr
+    obtain ⟨hσ_cont, hσ_nonneg⟩ := hReg ω hω
+    have hT_nonneg : 0 ≤ g.T := le_of_lt g.hT_pos
+    have hQV := g.quadratic_variation_domination_general (σ ω) hσ_cont
+    have hSplit := g.general_split_integral_lower_bound hδ hAM_pos hB (σ ω) hσ_cont hσ_nonneg
+    have hc₀_term : 0 ≤ g.c₀ * g.T ^ 3 / 3 := by
+      have hc₀ := g.c₀_nonneg
+      have hT := le_of_lt g.hT_pos
+      positivity
+    have hInt_q :
+        IntervalIntegrable (fun u => (g.q / 2) * (g.T - u) ^ 2 * (σ ω u) ^ 2) volume 0 g.T := by
+      apply ContinuousOn.intervalIntegrable
+      rw [uIcc_of_le hT_nonneg]
+      exact (continuousOn_const.mul ((continuousOn_const.sub continuousOn_id).pow 2)).mul
+        (hσ_cont.pow 2)
+    have hInt_q' :
+        IntervalIntegrable (fun x => g.q / 2 * ((g.T - x) ^ 2 * (σ ω x) ^ 2)) volume 0 g.T := by
+      simpa [mul_assoc] using hInt_q
+    have hInt_rem :
+        IntervalIntegrable
+          (fun u =>
+            (g.q / 2) * (g.T - u) ^ 2 * (σ ω u) ^ 2 +
+              (g.A_M M * (g.T - u) ^ 2 - g.W₂ u) * σ ω u)
+          volume 0 g.T := by
+      apply ContinuousOn.intervalIntegrable
+      rw [uIcc_of_le hT_nonneg]
+      have h1 : ContinuousOn (fun u => g.T - u) (Icc 0 g.T) := continuousOn_const.sub continuousOn_id
+      exact ((continuousOn_const.mul (h1.pow 2)).mul (hσ_cont.pow 2)).add
+        (((continuousOn_const.mul (h1.pow 2)).sub g.W₂_continuousOn).mul hσ_cont)
+    have hInt_decomp :
+        (∫ u in (0 : ℝ)..g.T,
+            (g.q * (g.T - u) ^ 2 * (σ ω u) ^ 2 +
+              (g.A_M M * (g.T - u) ^ 2 - g.W₂ u) * σ ω u)) =
+          (g.q / 2) * (∫ u in (0 : ℝ)..g.T, (g.T - u) ^ 2 * (σ ω u) ^ 2) +
+          (∫ u in (0 : ℝ)..g.T,
+            ((g.q / 2) * (g.T - u) ^ 2 * (σ ω u) ^ 2 +
+              (g.A_M M * (g.T - u) ^ 2 - g.W₂ u) * σ ω u)) := by
+      rw [← intervalIntegral.integral_const_mul, ← intervalIntegral.integral_add hInt_q' hInt_rem]
+      congr 1; ext u; ring
+    have hQuad_ω := hQuadTest ω hω
+    have hNeg : -(g.lam * M_T ω) = g.lam * (-M_T ω) := by ring
+    rw [hNeg, hQuad_ω, hInt_decomp]
+    have hlam_nonneg : 0 ≤ g.lam := le_of_lt g.lam_pos
+    have hMargin_ge : (1 / 2) * g.σ₀ * g.I₀ ≤ g.σ₀ * g.I₀ - g.tail δ := by linarith
+    have hMarg : ε₀ ≤ g.lam * (g.σ₀ * g.I₀ - g.tail δ) :=
+      mul_le_mul_of_nonneg_left hMargin_ge hlam_nonneg
+    have hc₀_scaled : 0 ≤ g.lam * (g.c₀ * g.T ^ 3 / 3) := mul_nonneg hlam_nonneg hc₀_term
+    have hSplit_scaled :
+        g.lam * (-g.tail δ) ≤
+          g.lam * ∫ u in (0 : ℝ)..g.T,
+            ((g.q / 2) * (g.T - u) ^ 2 * (σ ω u) ^ 2 +
+              (g.A_M M * (g.T - u) ^ 2 - g.W₂ u) * σ ω u) :=
+      mul_le_mul_of_nonneg_left hSplit hlam_nonneg
+    have hAssoc :
+        g.lam * ((g.q / 2) * (∫ u in (0 : ℝ)..g.T, (g.T - u) ^ 2 * (σ ω u) ^ 2)) =
+          (g.lam * g.q / 2) * (∫ u in (0 : ℝ)..g.T, (g.T - u) ^ 2 * (σ ω u) ^ 2) := by
+      ring
+    have hDist :
+        g.lam * (g.σ₀ * g.I₀ + g.c₀ * g.T ^ 3 / 3 +
+          ((g.q / 2) * (∫ u in (0 : ℝ)..g.T, (g.T - u) ^ 2 * (σ ω u) ^ 2) +
+            (∫ u in (0 : ℝ)..g.T,
+              ((g.q / 2) * (g.T - u) ^ 2 * (σ ω u) ^ 2 +
+                (g.A_M M * (g.T - u) ^ 2 - g.W₂ u) * σ ω u)))) =
+          g.lam * (g.σ₀ * g.I₀) + g.lam * (g.c₀ * g.T ^ 3 / 3) +
+            g.lam * ((g.q / 2) * (∫ u in (0 : ℝ)..g.T, (g.T - u) ^ 2 * (σ ω u) ^ 2)) +
+            g.lam * (∫ u in (0 : ℝ)..g.T,
+              ((g.q / 2) * (g.T - u) ^ 2 * (σ ω u) ^ 2 +
+                (g.A_M M * (g.T - u) ^ 2 - g.W₂ u) * σ ω u)) := by
+      ring
+    rw [hDist, hAssoc]
+    linarith
+  have h1_lt_exp : 1 < Real.exp ε₀ := Real.one_lt_exp_iff.mpr hε₀_pos
+  have hexp_le_EM := hMono (Real.exp ε₀) _ hPathwise
+  linarith
+
+end Theorem3GeneralKernels
 
 end RoughLogSVConjecture45

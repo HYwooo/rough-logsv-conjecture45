@@ -136,7 +136,7 @@
           #legend-item("#1b9e77")[$H = 0.50$]
           #h(10pt)
           #text(size: 8pt, fill: luma(70))[
-            #if is-zh [(虚线：$upright("LHS")_H$；圆点：表 1 参数点)] else [(dashed: $upright("LHS")_H$; dots: Table 1)]
+            #if is-zh [(虚线：$upright("LHS")_H$；圆点：表 2 参数点)] else [(dashed: $upright("LHS")_H$; dots: Table 2)]
           ]
         ],
         box(width: 398.00pt, height: 201.00pt)[
