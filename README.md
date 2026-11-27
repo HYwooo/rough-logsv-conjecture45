@@ -1,7 +1,7 @@
 # Proof of the Martingale Necessity Conjecture for Rough Log-Normal Stochastic Volatility with Quadratic Drift
 
-**Authors:** Gemini 4 Neon, Huayang WU (`huayang.bryan.wu[at]outlook.com`)  
-**Paper PDF:** [`paper/RoughLogSV_Conjecture45.pdf`](paper/RoughLogSV_Conjecture45.pdf)  
+**Author:** Huayang WU (`huayang.bryan.wu[at]outlook.com`) *(with drafting and formalization assistance acknowledged for Google Gemini 4 Neon)*  
+**Paper PDF:** [`paper/RoughLogSV_Conjecture45.pdf`](paper/RoughLogSV_Conjecture45.pdf) ([中文版 PDF](paper/RoughLogSV_Conjecture45_zh.pdf))  
 **Typst Source:** [`paper/rough_logsv_conjecture_4_5.typ`](paper/rough_logsv_conjecture_4_5.typ) & [`paper/bibliography.bib`](paper/bibliography.bib)  
 **Lean 4 + Mathlib4 Verification:** [`RoughLogSVConjecture45.lean`](RoughLogSVConjecture45.lean) (Lean `v4.36.0`, Mathlib `v4.36.0`, zero `sorry`)
 
@@ -37,8 +37,8 @@ Parameters: $T = 0.01$, $\sigma_0 = 0.5$, $c_1 = -2.0$, $q = 0.6$, $\vartheta = 
 
 The formalization [`RoughLogSVConjecture45.lean`](RoughLogSVConjecture45.lean) is built against Lean `v4.36.0` + Mathlib `v4.36.0` with a transparent 3-layer separation (zero `sorry`, and `#print axioms RoughLogSVConjecture45.conjecture_4_5` depends solely on `[propext, Classical.choice, Quot.sound]`):
 
-- **Layer 1 (Pure Real Analysis & Integral Estimates — Unconditional):** Formalizes over `ℝ` (`Real.Gamma`, `Real.rpow`, `intervalIntegral`) the quadratic-variation domination (`quadratic_variation_domination`, Eq. 16), main-interval non-negativity (`main_interval_integrand_nonneg`, Eq. 19), pointwise completing-the-square bound (`endpoint_layer_pointwise_lower_bound`, Eq. 20), exact boundary-layer integral (`boundary_layer_integral_eq`, Eq. 21), split-interval lower bound (`split_integral_lower_bound`, Eq. 22), classical $H=1/2$ specialization (`classical_endpoint_specialization`, Eq. 23), and constructive existence of $M$ (`exists_large_M_contradiction_margin`).
-- **Layer 2 (Stochastic Calculus Interface — Explicit Assumptions):** Isolates the continuous-time stochastic inputs from Steps 3.1–3.3 (Girsanov tilts, localized first-kind Volterra resolvent inversion, Itô integration by parts, and Fatou's lemma for the stopped Doléans–Dade exponential) as explicit fields of `VolterraMartingaleInterface`.
+- **Layer 1 (Pure Real Analysis & Integral Estimates — Unconditional):** Formalizes over `ℝ` (`Real.Gamma`, `Real.rpow`, `intervalIntegral`) the Step 2 deterministic resolvent test-weight integral (`resolvent_test_weight_eq`, Eq. 13 & `α = 1`), constant-term integral (`constant_test_weight_integral_eq`), quadratic-variation domination (`quadratic_variation_domination`, Eq. 16), main-interval non-negativity (`main_interval_integrand_nonneg`, Eq. 19), pointwise completing-the-square bound (`endpoint_layer_pointwise_lower_bound`, Eq. 20), exact boundary-layer integral (`boundary_layer_integral_eq`, Eq. 21), split-interval lower bound (`split_integral_lower_bound`, Eq. 22), classical $H=1/2$ specialization (`classical_endpoint_specialization`, Eq. 23), and constructive existence of $M$ (`exists_large_M_contradiction_margin`).
+- **Layer 2 (Stochastic Calculus Interface — Explicit Assumptions):** Isolates the continuous-time stochastic inputs from Steps 3.1–3.3 (Girsanov tilts, localized first-kind Volterra resolvent inversion, Itô integration by parts + stochastic Fubini in raw resolvent weight `W₂`, and Fatou's lemma for the stopped Doléans–Dade exponential) as explicit fields of `VolterraMartingaleInterface`.
 - **Layer 3 (End-to-End Main Theorem `conjecture_4_5`):** Combines Layer 1 and Layer 2 to conclude `I.E_S_T < I.S₀`.
 
 ### Building Locally
@@ -60,6 +60,9 @@ lake build
 ├── RoughLogSVConjecture45.lean
 └── paper/
     ├── RoughLogSV_Conjecture45.pdf
+    ├── RoughLogSV_Conjecture45_zh.pdf
     ├── bibliography.bib
-    └── rough_logsv_conjecture_4_5.typ
+    ├── figures.typ
+    ├── rough_logsv_conjecture_4_5.typ
+    └── rough_logsv_conjecture_4_5_zh.typ
 ```

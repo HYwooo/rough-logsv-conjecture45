@@ -2,7 +2,7 @@
   RoughLogSVConjecture45.lean
   ==============================================================================
   Structured Lean 4 + Mathlib4 formalization of the proof of Conjecture 4.5 of
-  Sepp & Rakhmonov (2026), arXiv:2611.32791v1, following Gemini 4 Neon and Huayang WU (2026):
+  Sepp & Rakhmonov (2026), arXiv:2611.32791v1, following Huayang WU (2026):
   "Proof of the Martingale Necessity Conjecture for Rough Log-Normal Stochastic
    Volatility with Quadratic Drift".
 
@@ -11,6 +11,8 @@
   * Layer 1 (Pure Real Analysis & Integral Estimates — ZERO axioms, ZERO sorry):
       Formalizes over `ℝ` (with `Real.Gamma`, `Real.rpow`, `intervalIntegral`)
       every analytical and quantitative step of Sections 3.2–3.4 of the paper:
+      - Step 2 deterministic resolvent test-weight integral (Eq. 13 & `α = 1`)
+      - Step 2 constant initial-volatility term integral (`leadingTerm`)
       - Exact quadratic-variation bound (Eq. 16)
       - Main-interval non-negativity on `[0, T - δ_M]` (Eq. 19)
       - Pointwise completing-the-square lower bound on `[T - δ_M, T]` (Eq. 20)
@@ -142,6 +144,13 @@ def leadingTerm (p : ModelParams) : ℝ :=
 def tailTerm (p : ModelParams) (M : ℝ) : ℝ :=
   (p.δ_M M) ^ (2 - 2 * p.H) / (p.q * (1 - p.H) * (Real.Gamma (3 - p.α)) ^ 2)
 
+/-- Raw first-kind resolvent quadratic test weight `W₂(s)` prior to closed-form integration (Step 2). -/
+def W₂ (p : ModelParams) (s : ℝ) : ℝ :=
+  if p.α < 1 then
+    2 * ∫ u in s..p.T, (p.T - u) * (u - s) ^ (-p.α) / Real.Gamma (1 - p.α)
+  else
+    2 * (p.T - s)
+
 lemma leadingTerm_pos (p : ModelParams) : 0 < p.leadingTerm := by
   unfold leadingTerm
   exact div_pos
@@ -162,9 +171,132 @@ lemma δ_M_rpow_α (p : ModelParams) {M : ℝ} (hA : 0 < p.A_M M) :
 
 end ModelParams
 
-/-! ## Layer 1: Pure Real Analysis & Quantitative Core (Eqs. 16, 18–24) -/
+/-! ## Layer 1: Pure Real Analysis & Quantitative Core (Eqs. 13, 16, 18–24) -/
 
 section Layer1Analysis
+
+/-- **Step 2 Deterministic Kernel-Weight Integral (Eq. 13 & `α = 1` branch)**:
+    For every `s ∈ [0, T]`, the raw resolvent test weight `W₂(s)` equals
+    `2 (T - s)^(2 - α) / Γ(3 - α)`. -/
+lemma resolvent_test_weight_eq (p : ModelParams) {s : ℝ} (hs : s ≤ p.T) :
+    p.W₂ s = 2 * (p.T - s) ^ (2 - p.α) / Real.Gamma (3 - p.α) := by
+  unfold ModelParams.W₂
+  by_cases hα : p.α < 1
+  · simp only [hα, ↓reduceIte]
+    have h1subα_pos : 0 < 1 - p.α := sub_pos.mpr hα
+    have h2subα_pos : 0 < 2 - p.α := by linarith
+    have hΓ1_pos : 0 < Real.Gamma (1 - p.α) := Real.Gamma_pos_of_pos h1subα_pos
+    have hΓ1_ne : Real.Gamma (1 - p.α) ≠ 0 := ne_of_gt hΓ1_pos
+    have h1subα_ne : (1 - p.α) ≠ 0 := ne_of_gt h1subα_pos
+    have h2subα_ne : (2 - p.α) ≠ 0 := ne_of_gt h2subα_pos
+    have hΓ2 : Real.Gamma (2 - p.α) = (1 - p.α) * Real.Gamma (1 - p.α) := by
+      have h : (2 : ℝ) - p.α = (1 - p.α) + 1 := by ring
+      rw [h, Real.Gamma_add_one h1subα_ne]
+    have hΓ3 : Real.Gamma (3 - p.α) = (2 - p.α) * ((1 - p.α) * Real.Gamma (1 - p.α)) := by
+      have h : (3 : ℝ) - p.α = (2 - p.α) + 1 := by ring
+      rw [h, Real.Gamma_add_one h2subα_ne, hΓ2]
+    rcases eq_or_lt_of_le hs with rfl | hs_lt
+    · simp [Real.zero_rpow h2subα_ne]
+    · set d : ℝ := p.T - s
+      have hd_pos : 0 < d := sub_pos.mpr hs_lt
+      -- Pull out `1 / Γ(1 - α)` and substitute `v = u - s`.
+      have hPull :
+          (∫ u in s..p.T, (p.T - u) * (u - s) ^ (-p.α) / Real.Gamma (1 - p.α)) =
+            (∫ u in s..p.T, (p.T - u) * (u - s) ^ (-p.α)) / Real.Gamma (1 - p.α) := by
+        simp [div_eq_mul_inv, intervalIntegral.integral_mul_const]
+      have hShift :
+          (∫ u in s..p.T, (p.T - u) * (u - s) ^ (-p.α)) =
+            ∫ v in (0 : ℝ)..d, (d - v) * v ^ (-p.α) := by
+        have hcomp := intervalIntegral.integral_comp_sub_right
+          (fun v => (d - v) * v ^ (-p.α)) s (a := s) (b := p.T)
+        simpa [d, sub_sub_sub_cancel_right, sub_self] using hcomp
+      -- Split `(d - v) * v^(-α) = d * v^(-α) - v^(1 - α)` everywhere on `[0, d]`.
+      have hCongr :
+          (∫ v in (0 : ℝ)..d, (d - v) * v ^ (-p.α)) =
+            ∫ v in (0 : ℝ)..d, (d * v ^ (-p.α) - v ^ (1 - p.α)) := by
+        apply intervalIntegral.integral_congr
+        intro v hv
+        rw [uIcc_of_le (le_of_lt hd_pos)] at hv
+        rcases eq_or_lt_of_le hv.1 with rfl | hv_pos
+        · simp [Real.zero_rpow h1subα_ne]
+        · have hPowV : v ^ (1 : ℝ) * v ^ (-p.α) = v ^ (1 - p.α) := by
+            have hExpV : (1 : ℝ) + (-p.α) = 1 - p.α := by ring
+            rw [← Real.rpow_add hv_pos, hExpV]
+          calc
+            (d - v) * v ^ (-p.α) = d * v ^ (-p.α) - v * v ^ (-p.α) := by ring
+            _ = d * v ^ (-p.α) - v ^ (1 : ℝ) * v ^ (-p.α) := by rw [Real.rpow_one]
+            _ = d * v ^ (-p.α) - v ^ (1 - p.α) := by rw [hPowV]
+      have hInt1 : IntervalIntegrable (fun v : ℝ => d * v ^ (-p.α)) volume 0 d := by
+        have hbase : IntervalIntegrable (fun v : ℝ => v ^ (-p.α)) volume 0 d :=
+          intervalIntegral.intervalIntegrable_rpow' (by linarith)
+        exact hbase.const_mul d
+      have hInt2 : IntervalIntegrable (fun v : ℝ => v ^ (1 - p.α)) volume 0 d :=
+        intervalIntegral.intervalIntegrable_rpow' (by linarith)
+      have hVal1 :
+          (∫ v in (0 : ℝ)..d, d * v ^ (-p.α)) = d ^ (2 - p.α) / (1 - p.α) := by
+        rw [intervalIntegral.integral_const_mul, integral_rpow (Or.inl (by linarith))]
+        have hExp : -p.α + 1 = 1 - p.α := by ring
+        rw [hExp, Real.zero_rpow h1subα_ne, sub_zero]
+        have hPow : d * d ^ (1 - p.α) = d ^ (2 - p.α) := by
+          have hExpD : (1 : ℝ) + (1 - p.α) = 2 - p.α := by ring
+          conv_lhs => arg 1; rw [← Real.rpow_one d]
+          rw [← Real.rpow_add hd_pos, hExpD]
+        rw [← mul_div_assoc, hPow]
+      have hVal2 :
+          (∫ v in (0 : ℝ)..d, v ^ (1 - p.α)) = d ^ (2 - p.α) / (2 - p.α) := by
+        rw [integral_rpow (Or.inl (by linarith))]
+        have hExp : (1 - p.α) + 1 = 2 - p.α := by ring
+        rw [hExp, Real.zero_rpow h2subα_ne, sub_zero]
+      rw [hPull, hShift, hCongr, intervalIntegral.integral_sub hInt1 hInt2, hVal1, hVal2, hΓ3]
+      field_simp [hΓ1_ne, h1subα_ne, h2subα_ne]
+      ring
+  · simp only [hα, ↓reduceIte]
+    have hα_eq : p.α = 1 := le_antisymm p.α_le_one (not_lt.mp hα)
+    rw [hα_eq]
+    have hExp : (2 : ℝ) - 1 = 1 := by norm_num
+    have hΓ : Real.Gamma ((3 : ℝ) - 1) = 1 := by
+      have h31 : (3 : ℝ) - 1 = ((1 : ℕ) : ℝ) + 1 := by norm_num
+      rw [h31, Real.Gamma_nat_eq_factorial]
+      norm_num
+    rw [hExp, Real.rpow_one, hΓ, div_one]
+
+/-- **Step 2 Constant-Term Integral**:
+    `σ₀ ∫_0^T W₂(s) ds = 2 σ₀ T^(3 - α) / Γ(4 - α) = p.leadingTerm`. -/
+lemma constant_test_weight_integral_eq (p : ModelParams) :
+    p.σ₀ * (∫ s in (0 : ℝ)..p.T, p.W₂ s) = p.leadingTerm := by
+  have hT_nonneg : 0 ≤ p.T := le_of_lt p.hT_pos
+  have hCongr :
+      (∫ s in (0 : ℝ)..p.T, p.W₂ s) =
+        ∫ s in (0 : ℝ)..p.T, 2 * (p.T - s) ^ (2 - p.α) / Real.Gamma (3 - p.α) := by
+    apply intervalIntegral.integral_congr
+    intro s hs
+    rw [uIcc_of_le hT_nonneg] at hs
+    exact resolvent_test_weight_eq p hs.2
+  have hPull :
+      (∫ s in (0 : ℝ)..p.T, 2 * (p.T - s) ^ (2 - p.α) / Real.Gamma (3 - p.α)) =
+        (2 / Real.Gamma (3 - p.α)) * ∫ s in (0 : ℝ)..p.T, (p.T - s) ^ (2 - p.α) := by
+    rw [← intervalIntegral.integral_const_mul]
+    congr 1; ext s; ring
+  have hSub :
+      (∫ s in (0 : ℝ)..p.T, (p.T - s) ^ (2 - p.α)) =
+        ∫ v in (0 : ℝ)..p.T, v ^ (2 - p.α) := by
+    simpa [sub_self, sub_zero] using
+      (intervalIntegral.integral_comp_sub_left (fun v => v ^ (2 - p.α)) p.T (a := 0) (b := p.T))
+  have h3subα_pos : 0 < 3 - p.α := p.three_sub_α_pos
+  have h3subα_ne : (3 - p.α) ≠ 0 := ne_of_gt h3subα_pos
+  have hΓ3_ne : Real.Gamma (3 - p.α) ≠ 0 := ne_of_gt p.Gamma_three_sub_α_pos
+  have hPowInt :
+      (∫ v in (0 : ℝ)..p.T, v ^ (2 - p.α)) = p.T ^ (3 - p.α) / (3 - p.α) := by
+    rw [integral_rpow (Or.inl (by linarith [p.α_le_one]))]
+    have hExp : (2 - p.α) + 1 = 3 - p.α := by ring
+    rw [hExp, Real.zero_rpow h3subα_ne, sub_zero]
+  have hΓ4 : Real.Gamma (4 - p.α) = (3 - p.α) * Real.Gamma (3 - p.α) := by
+    have h43 : (4 : ℝ) - p.α = (3 - p.α) + 1 := by ring
+    rw [h43, Real.Gamma_add_one h3subα_ne]
+  rw [hCongr, hPull, hSub, hPowInt]
+  unfold ModelParams.leadingTerm
+  rw [hΓ4]
+  field_simp [hΓ3_ne, h3subα_ne]
 
 /-- **Eq. (16) Pointwise Kernel Bound**:
     For `u ∈ [0, T]`, `(T - u)^4 ≤ T^2 (T - u)^2`. -/
@@ -506,10 +638,13 @@ continuous-time stochastic analysis inputs from Sections 3.1–3.3 of the paper
    `Q`-martingale on `[0, T]`, so for every constant `M : ℝ`, there exists an
    equivalent probability measure `Q_hat_M` under which `σ` remains a.s.
    continuous and non-negative on `[0, T]`, and satisfies Eq. (7).
-2. **Step 3.2 (`resolvent_fujita_kaplan_identity`)**:
+2. **Step 3.2 (`resolvent_quadratic_test_identity`)**:
    First-kind Volterra resolvent inversion (Abi Jaber–Larsson–Pulido 2019,
-   Lemma 2.6 + localization `τ_n`) and Itô integration by parts with
-   `φ(u) = (T - u)^2` yield the exact pathwise identity Eq. (14) `Q_hat_M`-a.s.
+   Lemma 2.6 + localization `τ_n`), Itô integration by parts with
+   `φ(u) = (T - u)^2` (Mitidieri–Pohozaev 2001), and Fubini's theorem yield the
+   pathwise Volterra test identity Eq. (12) in terms of the raw resolvent weight
+   `W₂(s)` `Q_hat_M`-a.s. (The deterministic Gamma/Beta evaluation of `W₂(s)` and
+   `σ₀ ∫_0^T W₂(s) ds` is proved unconditionally in Layer 1.)
 3. **Step 3.3 (`doleans_dade_supermartingale_bound`)**:
    Fatou's lemma applied to the stopped Doléans–Dade exponential of `-λ M_t`
    yields `E_{Q_hat_M}[exp(-λ M_T - (1/2) λ^2 ⟨M⟩_T)] ≤ 1` (Eq. 15).
@@ -528,10 +663,11 @@ structure VolterraMartingaleInterface (p : ModelParams) where
   - a volatility path family `σ : Ω → ℝ → ℝ`,
   - a terminal local martingale `M_T : Ω → ℝ`,
   - an event `Good : Set Ω` of full `Q_hat_M`-measure (where `σ ω` is continuous
-    and non-negative on `[0, T]` and Eq. (14) holds pathwise),
+    and non-negative on `[0, T]` and the resolvent quadratic test-function
+    identity holds pathwise),
   satisfying:
   - Monotonicity of `E_M` on deterministic constants (`Good`-a.s. lower bound `c ≤ X` ⇒ `c ≤ E_M X`),
-  - Pathwise Fujita–Kaplan identity Eq. (14) on `Good`,
+  - Pathwise quadratic test-function identity (Eq. 12 + Fubini in raw weight `W₂`) on `Good`,
   - Doléans–Dade supermartingale bound Eq. (15).
   -/
   tilted_system :
@@ -540,14 +676,13 @@ structure VolterraMartingaleInterface (p : ModelParams) where
       ∃ (E_M : (Ω → ℝ) → ℝ) (σ : Ω → ℝ → ℝ) (M_T : Ω → ℝ) (Good : Set Ω),
         -- (a) Continuity and non-negativity of `σ ω` on `[0, T]` for `ω ∈ Good`
         (∀ ω ∈ Good, ContinuousOn (σ ω) (Icc 0 p.T) ∧ ∀ u ∈ Icc 0 p.T, 0 ≤ σ ω u) ∧
-        -- (b) Exact pathwise Fujita–Kaplan identity (Eq. 14) on `Good`
+        -- (b) Exact pathwise quadratic test-function identity (Eq. 12 + Fubini) on `Good`
         (∀ ω ∈ Good,
           -M_T ω =
-            p.leadingTerm + p.c₀ * p.T ^ 3 / 3 +
-            ∫ u in (0 : ℝ)..p.T,
-              (p.q * (p.T - u) ^ 2 * (σ ω u) ^ 2 +
-                (p.A_M M * (p.T - u) ^ 2 -
-                  2 * (p.T - u) ^ (2 - p.α) / Real.Gamma (3 - p.α)) * σ ω u)) ∧
+            p.σ₀ * (∫ s in (0 : ℝ)..p.T, p.W₂ s) + p.c₀ * p.T ^ 3 / 3 +
+            ∫ s in (0 : ℝ)..p.T,
+              (p.q * (p.T - s) ^ 2 * (σ ω s) ^ 2 +
+                (p.A_M M * (p.T - s) ^ 2 - p.W₂ s) * σ ω s)) ∧
         -- (c) Doléans–Dade exponential supermartingale bound (Eq. 15)
         E_M (fun ω => Real.exp (-(p.lam * M_T ω) -
             (1 / 2) * p.lam ^ 2 * p.ϑ ^ 2 *
@@ -575,7 +710,7 @@ theorem conjecture_4_5 (p : ModelParams) (I : VolterraMartingaleInterface p) :
   -- Step 4: Pick `M` via Layer 1 so that `A_M > 0`, `δ_M ≤ T`, and `tailTerm M < leadingTerm`.
   obtain ⟨M, hAM_pos, hδ_le, hMargin⟩ := exists_large_M_contradiction_margin p
   -- Steps 1–3: Extract the tilted system under `Q_hat_M` from Layer 2.
-  obtain ⟨E_M, σ, M_T, Good, hReg, hFK, hDD, hMono⟩ := I.tilted_system hEq M hAM_pos
+  obtain ⟨E_M, σ, M_T, Good, hReg, hQuadTest, hDD, hMono⟩ := I.tilted_system hEq M hAM_pos
   -- Define the strictly positive deterministic lower bound `ε₀ > 0`.
   set ε₀ : ℝ := p.lam * (p.leadingTerm - p.tailTerm M)
   have hε₀_pos : 0 < ε₀ := mul_pos p.lam_pos (sub_pos.mpr hMargin)
@@ -637,9 +772,31 @@ theorem conjecture_4_5 (p : ModelParams) (I : VolterraMartingaleInterface p) :
                 2 * (p.T - u) ^ (2 - p.α) / Real.Gamma (3 - p.α)) * σ ω u)) := by
       rw [← intervalIntegral.integral_const_mul, ← intervalIntegral.integral_add hInt_q' hInt_rem]
       congr 1; ext u; ring
-    have hFK_ω := hFK ω hω
+    have hQuadTest_ω :
+        -M_T ω =
+          p.leadingTerm + p.c₀ * p.T ^ 3 / 3 +
+          ∫ u in (0 : ℝ)..p.T,
+            (p.q * (p.T - u) ^ 2 * (σ ω u) ^ 2 +
+              (p.A_M M * (p.T - u) ^ 2 -
+                2 * (p.T - u) ^ (2 - p.α) / Real.Gamma (3 - p.α)) * σ ω u) := by
+      have hRaw := hQuadTest ω hω
+      have hConst := constant_test_weight_integral_eq p
+      have hIntegrand :
+          (∫ s in (0 : ℝ)..p.T,
+              (p.q * (p.T - s) ^ 2 * (σ ω s) ^ 2 +
+                (p.A_M M * (p.T - s) ^ 2 - p.W₂ s) * σ ω s)) =
+            ∫ u in (0 : ℝ)..p.T,
+              (p.q * (p.T - u) ^ 2 * (σ ω u) ^ 2 +
+                (p.A_M M * (p.T - u) ^ 2 -
+                  2 * (p.T - u) ^ (2 - p.α) / Real.Gamma (3 - p.α)) * σ ω u) := by
+        apply intervalIntegral.integral_congr
+        intro s hs
+        rw [uIcc_of_le hT_nonneg] at hs
+        dsimp only
+        rw [resolvent_test_weight_eq p hs.2]
+      rw [hRaw, hConst, hIntegrand]
     have hNeg : -(p.lam * M_T ω) = p.lam * (-M_T ω) := by ring
-    rw [hNeg, hFK_ω, hInt_decomp]
+    rw [hNeg, hQuadTest_ω, hInt_decomp]
     have hlam_nonneg : 0 ≤ p.lam := le_of_lt p.lam_pos
     nlinarith
   -- Step 4 Finale (Eq. 24): `1 < exp ε₀ ≤ E_M[...] ≤ 1`, contradiction!
