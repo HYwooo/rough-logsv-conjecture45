@@ -3,7 +3,7 @@
 **Author:** Huayang WU  *(with drafting and formalization assistance acknowledged for Google Gemini 4 Neon)*  
 **Paper PDF:** [`paper/RoughLogSV_Conjecture45.pdf`](paper/RoughLogSV_Conjecture45.pdf) ([中文版 PDF](paper/RoughLogSV_Conjecture45_zh.pdf))  
 **Typst Source:** [`paper/rough_logsv_conjecture_4_5.typ`](paper/rough_logsv_conjecture_4_5.typ) & [`paper/bibliography.bib`](paper/bibliography.bib)  
-**Lean 4 + Mathlib4 Verification:** [`RoughLogSVConjecture45.lean`](RoughLogSVConjecture45.lean) (Lean `v4.36.0`, Mathlib `v4.36.0`, zero `sorry`)
+**Lean 4 Scope:** [`RoughLogSVConjecture45.lean`](RoughLogSVConjecture45.lean) (Lean `v4.36.0`, Mathlib `v4.36.0`, zero `sorry`) formalizes the deterministic real-analysis bounds (Layer 1) and conditional proof-by-contradiction deduction (Layer 3) under explicit continuous-time stochastic-calculus assumptions (Layer 2)
 
 ## Overview
 
@@ -21,7 +21,7 @@ $$\frac{\mathrm{d}S_t}{S_t} = \sigma_t\,\mathrm{d}W_t^{(0)}, \qquad \sigma_t = \
 
 1. **Share-measure reduction:** Assuming $\mathbb{E}_{\mathbb{Q}}[S_T] = S_0$ defines $\hat{\mathbb{Q}} \sim \mathbb{Q}$ via $\mathrm{d}\hat{\mathbb{Q}}/\mathrm{d}\mathbb{Q}|_{\mathcal{F}_T} = S_T/S_0$, flipping the quadratic drift to $+q \hat{\sigma}_s^2$ with $q := \beta - \kappa_2 > 0$.
 2. **Constant-drift Cameron–Martin tilt:** Tilting by $\exp(M \hat{B}_T - \frac{1}{2}M^2 T)$ shifts the linear drift $c_1 \mapsto A_M := c_1 + \vartheta M \to +\infty$ on $[0, T]$.
-3. **First-kind resolvent & quadratic test function:** Convolving with the non-negative first-kind resolvent $L$ and applying localized stochastic Fubini (Abi Jaber–Larsson–Pulido 2019, Lemma 2.6, on $\{\tau_n = T\}$) gives $Z_t = (L * (\hat{\sigma} - \sigma_0))_t$; testing $\mathrm{d}Z_u$ against $\varphi(u) = (T - u)^2$ yields a unified identity for all $H \in (0, 1/2]$.
+3. **First-kind resolvent & quadratic test function:** Convolving with the non-negative first-kind resolvent $L$ and applying localized stochastic Fubini (Abi Jaber–Larsson–Pulido 2019, Lemma 2.6, together with Tonelli's theorem on $\Omega \times [0, T]$ and sample-path continuity at $t \in [0, T]$) yields $Z_t = (L * (\hat{\sigma} - \sigma_0))_t$; testing $\mathrm{d}Z_u$ against $\varphi(u) = (T - u)^2$ yields a unified identity for all $H \in (0, 1/2]$.
 4. **Doléans–Dade supermartingale & boundary-layer splitting:** Choosing $\lambda = q/(\vartheta^2 T^2)$ absorbs $\frac{1}{2}\lambda^2\langle\mathcal{M}\rangle_T$ into half of the positive quadratic drift, while splitting $[0, T] = [0, T-\delta_M] \cup [T-\delta_M, T]$ yields a strictly positive deterministic pathwise lower bound contradicting Fatou's lemma $\mathbb{E}_{\hat{\mathbb{Q}}_M}[\mathcal{E}_T(-\lambda \mathcal{M})] \le 1$.
 
 ## Quantitative Benchmarks (Tables 2 & 3 in Paper)
@@ -50,9 +50,9 @@ Parameters: $T = 0.01$, $\sigma_0 = 0.5$, $c_1 = -2.0$, $q = 0.6$, $\vartheta = 
 | Exp ($\varkappa = 20$) | $1.2000$ | $7.49 \times 10^{-6}$ | $5.33 \times 10^{-5}$ | $2.50 \times 10^{-5}$ | $+2.84 \times 10^{-5}$ |
 | Exp ($\varkappa = 50$) | $1.5000$ | $7.49 \times 10^{-6}$ | $5.83 \times 10^{-5}$ | $2.50 \times 10^{-5}$ | $+3.34 \times 10^{-5}$ |
 
-## Lean 4 Verification
+## Lean 4 Formalization & Verification Scope
 
-The formalization [`RoughLogSVConjecture45.lean`](RoughLogSVConjecture45.lean) is built against Lean `v4.36.0` + Mathlib `v4.36.0` with a transparent 3-layer separation (zero `sorry`, and `#print axioms` confirms both `conjecture_4_5` and `general_kernel_theorem_3` depend solely on `[propext, Classical.choice, Quot.sound]`):
+[`RoughLogSVConjecture45.lean`](RoughLogSVConjecture45.lean) is built against Lean `v4.36.0` + Mathlib `v4.36.0` with a transparent 3-layer separation (zero `sorry`). **Scope note:** Mathlib4 does not yet cover continuous-time stochastic calculus (Volterra Girsanov tilts, localized stochastic Fubini, Itô integration by parts, and Doléans–Dade supermartingales), so those continuous-time stochastic steps are explicitly isolated as **Layer 2** structure assumptions rather than proved in Lean; what Lean 4 mechanically verifies are **all deterministic real-analysis / measure-theoretic bounds (Layer 1)** and **the end-to-end conditional contradiction arguments (Layer 3)** deriving `E_Q[S_T] < S_0` from Layer 1 + Layer 2:
 
 - **Sections 1–3 (`conjecture_4_5`, Fractional & Classical $H \in (0, 1/2]$):**
   - *Layer 1 (Pure Real Analysis & Integral Estimates):* `resolvent_test_weight_eq`, `constant_test_weight_integral_eq`, `quadratic_variation_domination`, `main_interval_integrand_nonneg`, `endpoint_layer_pointwise_lower_bound`, `boundary_layer_integral_eq`, `split_integral_lower_bound`, `classical_endpoint_specialization`, and `exists_large_M_contradiction_margin`.
@@ -60,26 +60,35 @@ The formalization [`RoughLogSVConjecture45.lean`](RoughLogSVConjecture45.lean) i
   - *Layer 3 (`conjecture_4_5`):* Combines Layer 1 and Layer 2 to derive `I.E_S_T < I.S₀`.
 - **Section 4 (`Theorem3GeneralKernels`, General Completely Monotone Kernels):**
   - *Layer 1 (`GeneralKernelParams`):* Models an abstract finite non-negative Radon resolvent measure `L` on `[0, T]` with `∫_[0,t] K(t-r) dL(r) > 0` for some `t ∈ (0, T/2)`, and unconditionally proves `W₂_continuousOn`, `W₂_le`, `W₂_lower_half`, `I₀_pos`, `B_bound_valid`, `integrable_tail`, `tail_le`, `exists_general_M_contradiction_margin`, `general_split_integral_lower_bound`, and `quadratic_variation_domination_general`.
-  - *Layer 2 (`GeneralVolterraMartingaleInterface`):* Isolates stochastic calculus inputs for the general kernel (`resolvent_measure_quadratic_identity`).
+  - *Layer 2 (`GeneralVolterraMartingaleInterface`):* Isolates the continuous-time stochastic-calculus identity and Doléans–Dade bound for general `K ∈ L²([0, T])`.
   - *Layer 3 (`general_kernel_theorem_3`):* Combines Layer 1 and Layer 2 to derive `I.E_S_T < I.S₀`.
+- **Section 5 (`NonVacuityChecks`, Interface Consistency & Axiom Audit):**
+  - Instantiates both interfaces in the strict-local-martingale regime (`E_S_T = 0 < 1 = S₀`) and explicitly verifies that all four inner stochastic requirements of `tilted_system` hold simultaneously without contradiction when either `σ₀ = c₀ = 0` or `q = 0` (`β = κ₂`), confirming contradictions cannot arise from vacuous field incompatibilities.
+  - `#print axioms` confirms `conjecture_4_5`, `general_kernel_theorem_3`, `GeneralKernelParams.I₀_pos`, and `GeneralKernelParams.tail_le` depend solely on `[propext, Classical.choice, Quot.sound]`.
 
-### Building Locally
+### Building & Regenerating Figures Locally
 
 ```bash
 lake exe cache get   # if fetching Mathlib cache for the first time
 lake build
+
+# Regenerate vector figures in paper/figures.typ
+python scripts/generate_figures.py
 ```
 
 ## Repository Structure
 
 ```text
 .
+├── .github/workflows/lean.yml
 ├── .gitignore
 ├── README.md
 ├── lakefile.toml
 ├── lake-manifest.json
 ├── lean-toolchain
 ├── RoughLogSVConjecture45.lean
+├── scripts/
+│   └── generate_figures.py
 └── paper/
     ├── RoughLogSV_Conjecture45.pdf
     ├── RoughLogSV_Conjecture45_zh.pdf

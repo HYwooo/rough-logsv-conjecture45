@@ -110,10 +110,12 @@ $ <eq:kernel>
 将定理 1 与 #cite(<sepp2026rough>, form: "prose", supplement: [Theorem 4.3]) 结合，即可得到整个 Hurst 区间 $H in (0, 1\/2]$ 上的真鞅刻画边界：
 
 #thmblock("推论 2（精确鞅性边界）")[
-  在定理 1 的参数假设下，对任意 $H in (0, 1\/2]$ 与任意 $T > 0$，@eq:model 中的远期价格 $S$ 在 $[0, T]$ 上为真 $QQ$-鞅当且仅当 $kappa_2 >= beta$。
+  在定理 1 与 #cite(<sepp2026rough>, form: "prose", supplement: [Theorem 4.3]) 的共同参数假设下（特别是 $H in (0, 1\/2]$、$sigma_0 > 0$、$theta > 0$、$kappa_1 >= 0$、$kappa_2 >= 0$、$epsilon.alt >= 0$ 且 $beta in RR$；在 $H = 1\/2$ 处亦参见 #cite(<sepp2023lognormal>, form: "prose", supplement: [Theorem 3.7])），对任意 $T > 0$，@eq:model 中的远期价格 $S$ 在 $[0, T]$ 上为真 $QQ$-鞅当且仅当 $kappa_2 >= beta$。
 ]
 
-*注（严格正性与边界漂移假设）。* 定理 1 并不依赖 $sigma_t$ 的严格正性（#cite(<sepp2026rough>, form: "prose", supplement: [Conjecture 2.3])），仅要求 $sigma_t >= 0$ a.s.，而这一性质已由 #cite(<sepp2026rough>, form: "prose", supplement: [Theorem 2.2]) 建立。此外，条件 $c_0 >= 0$ 仅为行文便利而非本质限制。若当 $c_0 < 0$ 时存在连续非负解且 $EE_QQ[S_T] = S_0$，则由上鞅性质对所有 $t in (0, T]$ 均有 $EE_QQ[S_t] = S_0$。由于对任意 $alpha in (1\/2, 1]$ 都有 $3 - alpha < 3$，取充分小的 $t in (0, T]$ 即可保证 $2 sigma_0 t^(3 - alpha) \/ Gamma(4 - alpha) + c_0 t^3 \/ 3 > 0$，进而在 $[0, t]$ 上沿用同一证明即可导出矛盾。
+*证明。* 必要性（$kappa_2 >= beta$）由定理 1 在其全部参数假设与 $H in (0, 1\/2]$ 下给出；充分性直接引自 #cite(<sepp2026rough>, form: "prose", supplement: [Theorem 4.3])（其中经典扩散端点 $H = 1\/2$ 亦见 #cite(<sepp2023lognormal>, form: "prose", supplement: [Theorem 3.7])）。 #h(1fr) $square$
+
+*注（严格正性、初始波动率退化与边界漂移假设）。* 定理 1 并不依赖 $sigma_t$ 的严格正性（#cite(<sepp2026rough>, form: "prose", supplement: [Conjecture 2.3])），仅要求 $sigma_t >= 0$ a.s.，而这一性质已由 #cite(<sepp2026rough>, form: "prose", supplement: [Theorem 2.2]) 建立。需要指出的是，当 $sigma_0 = kappa_1 = 0$（即 $c_0 = 0$）时，平凡解 $sigma equiv 0$ 与 $S equiv S_0$ 在 $beta > kappa_2$ 时仍为真鞅，说明 $sigma_0 > 0$ 与 $c_0 > 0$ 不能同时省略。反之，若在 $sigma_0 = 0$ 且 $c_0 = kappa_1 theta > 0$ 下存在连续全局非负解，则只要在 @eq:exp-lower（以及定理 3 中的 @eq:general-exp-lower）中保留正常数项 $(c_0 T^3) \/ 3 > 0$，其余论证无需本质改动即可导出同样矛盾。此外，条件 $c_0 >= 0$ 仅为行文便利而非本质限制。若当 $c_0 < 0$ 时存在连续非负解且 $EE_QQ[S_T] = S_0$，则由上鞅性质对所有 $t in (0, T]$ 均有 $EE_QQ[S_t] = S_0$。由于对任意 $alpha in (1\/2, 1]$ 都有 $3 - alpha < 3$，取充分小的 $t in (0, T]$ 即可保证 $2 sigma_0 t^(3 - alpha) \/ Gamma(4 - alpha) + c_0 t^3 \/ 3 > 0$，进而在 $[0, t]$ 上沿用同一证明即可导出矛盾。
 
 = 定理 1 的证明
 
@@ -125,7 +127,7 @@ $ <eq:kernel>
 $
   hat(B)_t := W_t^sigma - (beta / theta.alt) integral_0^t sigma_s dif s, quad t in [0, T],
 $
-为标准 $hat(QQ)$-布朗运动，且 $hat(sigma) := sigma$ 在 $[0, T]$ 上是 $hat(QQ)$-a.s. 连续、有限的非负过程，满足
+为标准 $hat(QQ)$-布朗运动。对每个固定的 $t in [0, T]$，由 $sigma$ 连续性与 $K in L^2([0, T])$ 可得 $integral_0^t K(t-s)^2 sigma_s^2 dif s < infinity$ $QQ$-a.s.；经停时 $tau_n := inf{ u in [0, T] : sigma_u >= n } and T$ 局部化后，Girsanov 定理及等价测度变换下随机积分的不变性保证该 Volterra 方程对每个 $t in [0, T]$ 几乎必然保持漂移修正关系（进而由 $hat(sigma) := sigma$ 的样本路径连续性在 $[0, T]$ 上一致成立）。于是 $hat(sigma)$ 在 $[0, T]$ 上是 $hat(QQ)$-a.s. 连续、有限的非负过程，满足
 $
   hat(sigma)_t = sigma_0 + integral_0^t K(t-s) [ c_0 + c_1 hat(sigma)_s + q hat(sigma)_s^2 ] dif s + integral_0^t K(t-s) theta.alt hat(sigma)_s dif hat(B)_s.
 $
@@ -134,7 +136,7 @@ $
 $
   (dif hat(QQ)_M) / (dif hat(QQ)) bar_(cal(F)_T) := exp( M hat(B)_T - 1/2 M^2 T ).
 $
-因为 $M$ 为确定性常数，Novikov 条件自动成立，故 $hat(QQ)_M$ 是与 $QQ$ 在 $cal(F)_T$ 上等价的概率测度，且 $hat(B)_t^M := hat(B)_t - M t$ 为标准 $hat(QQ)_M$-布朗运动。由随机积分在等价测度变换下的不变性，同一连续非负过程 $hat(sigma)$ 在 $hat(QQ)_M$ 下满足
+因为 $M$ 为确定性常数，Novikov 条件自动成立，故 $hat(QQ)_M$ 是与 $QQ$ 在 $cal(F)_T$ 上等价的概率测度，且 $hat(B)_t^M := hat(B)_t - M t$ 为标准 $hat(QQ)_M$-布朗运动。由同样的局部化论证与等价测度变换下随机积分的不变性，同一连续非负过程 $hat(sigma)$ 在 $hat(QQ)_M$ 下满足
 $
   hat(sigma)_t = sigma_0 + integral_0^t K(t-s) [ c_0 + A_M hat(sigma)_s + q hat(sigma)_s^2 ] dif s + integral_0^t K(t-s) theta.alt hat(sigma)_s dif hat(B)_s^M, quad t in [0, T].
 $ <eq:tilted>
@@ -152,7 +154,7 @@ $
     delta_0(dif s) & "若 " alpha = 1.
   )
 $
-对每个 $n >= 1$，定义停时 $tau_n := inf{ t in [0, T] : hat(sigma)_t >= n } and T$，以及停过程 $Z_t^(tau_n) := Z_(t and tau_n)$ 与卷积过程 $X_t^((n)) := (K * dif Z^(tau_n))_t$。在 $[0, tau_n]$ 上因 $hat(sigma)_s <= n$，半鞅 $Z^(tau_n)$ 的漂移与扩散被积函数一致有界。应用 #cite(<abijaber2019affine>, form: "prose", supplement: [Lemma 2.6]) 的随机 Fubini 引理，可得对所有 $t in [0, T]$ 均有 $(L * X^((n)))_t = ((L * K) * dif Z^(tau_n))_t = Z_t^(tau_n)$，$hat(QQ)_M$-a.s.。由随机积分的局部性，在事件 ${tau_n = T}$ 上对所有 $u in [0, T]$ 均有 $X_u^((n)) = hat(sigma)_u - sigma_0$ 且 $Z_u^(tau_n) = Z_u$。又因 $hat(sigma)$ 在 $[0, T]$ 上 $hat(QQ)_M$-a.s. 连续，并集 $union.big_(n >= 1) {tau_n = T}$ 具有 $hat(QQ)_M$ 全测度，由此得到逐轨反演公式：
+对每个 $n >= 1$，定义停时 $tau_n := inf{ t in [0, T] : hat(sigma)_t >= n } and T$、停过程 $Z_t^(tau_n) := Z_(t and tau_n)$，以及卷积过程 $X_t^((n)) := (K * dif Z^(tau_n))_t$ 的一个联合可测修正。在 $[0, tau_n]$ 上因 $hat(sigma)_s <= n$，半鞅 $Z^(tau_n)$ 的漂移与扩散被积函数一致有界。应用 #cite(<abijaber2019affine>, form: "prose", supplement: [Lemma 2.6]) 的随机 Fubini 引理，可得对 Lebesgue-a.e. $t in [0, T]$ 均有 $(L * X^((n)))_t = ((L * K) * dif Z^(tau_n))_t = Z_t^(tau_n)$，$hat(QQ)_M$-a.s.。此外，由随机积分的局部性，对每个固定的 $u in [0, T]$，在事件 ${tau_n = T}$ 上 $hat(QQ)_M$-a.s. 成立 $X_u^((n)) = hat(sigma)_u - sigma_0$ 且 $Z_u^(tau_n) = Z_u$；由乘积空间 $Omega times [0, T]$ 上的 Tonelli 定理，在 ${tau_n = T}$ 上上述等式对 Lebesgue-a.e. $u in [0, T]$ 成立，$hat(QQ)_M$-a.s.。由于 $L$ 是 $[0, T]$ 上的有限非负 Borel 测度，与 $L$ 作卷积保持 Lebesgue 零测集不变（由 Tonelli 定理，即便 $L$ 在 $0$ 处含原子亦成立）。再取 $union.big_(n >= 1) {tau_n = T}$（由 $hat(sigma)$ 样本连续性知其具有 $hat(QQ)_M$ 全测度），便得对 Lebesgue-a.e. $t in [0, T]$ 成立 $Z_t = (L * (hat(sigma) - sigma_0))_t$，$hat(QQ)_M$-a.s.。最后，由于左端 $Z$ 连续，而零延拓 $u |-> (hat(sigma)_u - sigma_0) bb(1)_({u >= 0})$ 在 $RR$ 上连续（因 $hat(sigma)_0 - sigma_0 = 0$），由控制收敛定理可知右端对任意有限测度 $L$ 亦关于 $t in [0, T]$ 连续，从而得到逐轨反演公式：
 $
   Z_t = (L * (hat(sigma) - sigma_0))_t = integral_([0, t]) (hat(sigma)_(t-r) - sigma_0) L(dif r), quad forall t in [0, T], quad hat(QQ)_M"-a.s."
 $ <eq:Z-inv>
@@ -190,9 +192,9 @@ $
   1/2 lambda^2 chevron.l cal(M) chevron.r_T &= 1/2 lambda^2 theta.alt^2 integral_0^T (T - u)^4 hat(sigma)_u^2 dif u \
   &<= 1/2 lambda^2 theta.alt^2 T^2 integral_0^T (T - u)^2 hat(sigma)_u^2 dif u = (lambda q) / 2 integral_0^T (T - u)^2 hat(sigma)_u^2 dif u.
 $
-将该上界与 @eq:pathwise 结合，并舍去非负项 $c_0 T^3 \/ 3 >= 0$，即得（$hat(QQ)_M$-a.s.）：
+将该上界与 @eq:pathwise 结合，即得（$hat(QQ)_M$-a.s.）：
 $
-  -lambda cal(M)_T - 1/2 lambda^2 chevron.l cal(M) chevron.r_T >= lambda [ & (2 sigma_0 T^(3 - alpha)) / Gamma(4 - alpha) + integral_0^T ( q/2 (T - u)^2 hat(sigma)_u^2 \
+  -lambda cal(M)_T - 1/2 lambda^2 chevron.l cal(M) chevron.r_T >= lambda [ & (2 sigma_0 T^(3 - alpha)) / Gamma(4 - alpha) + (c_0 T^3) / 3 + integral_0^T ( q/2 (T - u)^2 hat(sigma)_u^2 \
     & + ( A_M (T - u)^2 - (2 (T - u)^(2 - alpha)) / Gamma(3 - alpha) ) hat(sigma)_u ) dif u ].
 $ <eq:exp-lower>
 
@@ -217,7 +219,7 @@ $
     - 2 / (q Gamma(3 - alpha)^2) integral_(T - delta_M)^T (T - u)^(1 - 2 H) dif u = - delta_M^(2 - 2 H) / (q (1 - H) Gamma(5/2 - H)^2).
   $
 
-将两段估计代入 @eq:exp-lower，即得确定性逐轨下界（$hat(QQ)_M$-a.s.）：
+舍去非负项 $(c_0 T^3) \/ 3 >= 0$ 并将两段估计代入 @eq:exp-lower，即得确定性逐轨下界（$hat(QQ)_M$-a.s.）：
 $
   -lambda cal(M)_T - 1/2 lambda^2 chevron.l cal(M) chevron.r_T >= lambda [ (2 sigma_0 T^(5/2 - H)) / Gamma(7/2 - H) - delta_M^(2 - 2 H) / (q (1 - H) Gamma(5/2 - H)^2) ].
 $ <eq:final-bound>
@@ -282,14 +284,14 @@ $ <eq:W2-def>
 
 接下来用反证法证明 $EE_QQ[S_T] < S_0$。反设 $EE_QQ[S_T] = S_0$。逐字沿用第 3 节第一步，对任意使 $A_M := c_1 + theta.alt M > 0$ 的常数 $M > 0$，均可构造等价概率测度 $hat(QQ)_M tilde QQ$ 及标准 $hat(QQ)_M$-布朗运动 $hat(B)^M$，使得 $hat(sigma)$ 在 $[0, T]$ 上连续非负且满足 $hat(sigma) - sigma_0 = K * dif Z$，其中 $Z$ 由 式 8 给出。
 
-因 $K in L^2([0, T])$ 且 $L$ 为 $[0, T]$ 上满足 $K * L equiv 1$ 的非负有限测度，第 3.2 节基于停时 $tau_n = inf{ t in [0, T] : hat(sigma)_t >= n } and T$ 与 #cite(<abijaber2019affine>, form: "prose", supplement: [Lemma 2.6]) 的局部化论证原封不动地成立，给出 $hat(QQ)_M$-a.s. 逐轨反演 $Z_t = integral_([0, t]) (hat(sigma)_(t - r) - sigma_0) L(dif r)$（$forall t in [0, T]$）。用检验函数 $phi(u) = (T - u)^2$ 分部积分得 $integral_0^T (T - u)^2 dif Z_u = 2 integral_0^T (T - u) Z_u dif u$。应用 Fubini 定理（由 $hat(sigma)$ 在 $[0, T]$ 上连续及 $L([0, T]) < infinity$ 保证逐轨成立）并作变量替换 $s = u - r$：
+因 $K in L^2([0, T])$ 且 $L$ 为 $[0, T]$ 上满足 $K * L equiv 1$ 的非负有限测度，第 3.2 节基于停时 $tau_n = inf{ t in [0, T] : hat(sigma)_t >= n } and T$、取 $X^((n)) := (K * dif Z^(tau_n))$ 联合可测修正、#cite(<abijaber2019affine>, form: "prose", supplement: [Lemma 2.6])、乘积空间 Tonelli 定理以及由 $hat(sigma)_0 - sigma_0 = 0$ 与控制收敛定理得到的连续性论证原封不动地成立，给出 $hat(QQ)_M$-a.s. 逐轨反演 $Z_t = integral_([0, t]) (hat(sigma)_(t - r) - sigma_0) L(dif r)$（$forall t in [0, T]$）。用检验函数 $phi(u) = (T - u)^2$ 分部积分得 $integral_0^T (T - u)^2 dif Z_u = 2 integral_0^T (T - u) Z_u dif u$。应用 Fubini 定理（由 $hat(sigma)$ 在 $[0, T]$ 上连续及 $L([0, T]) < infinity$ 保证逐轨成立）并作变量替换 $s = u - r$：
 $
   2 integral_0^T (T - u) integral_([0, u]) (hat(sigma)_(u - r) - sigma_0) L(dif r) dif u &= integral_0^T (hat(sigma)_s - sigma_0) ( 2 integral_([0, T - s]) (T - s - r) L(dif r) ) dif s \
   &= integral_0^T W_2(s) (hat(sigma)_s - sigma_0) dif s.
 $
 分离出 $-cal(M)_T$，并与 Doléans--Dade 上鞅界 @eq:fatou 及二次变差控制 $(1\/2) lambda^2 chevron.l cal(M) chevron.r_T <= (lambda q \/ 2) integral_0^T (T - u)^2 hat(sigma)_u^2 dif u$（其中 $lambda = q \/ (theta.alt^2 T^2)$）结合，得到（$hat(QQ)_M$-a.s.）：
 $
-  -lambda cal(M)_T - 1/2 lambda^2 chevron.l cal(M) chevron.r_T >= lambda [ & sigma_0 I_0(T) + integral_0^T ( q / 2 (T - u)^2 hat(sigma)_u^2 \
+  -lambda cal(M)_T - 1/2 lambda^2 chevron.l cal(M) chevron.r_T >= lambda [ & sigma_0 I_0(T) + (c_0 T^3) / 3 + integral_0^T ( q / 2 (T - u)^2 hat(sigma)_u^2 \
     & + (A_M (T - u)^2 - W_2(u)) hat(sigma)_u ) dif u ].
 $ <eq:general-exp-lower>
 由 (i) 与 (iii)，取充分小的 $delta in (0, T)$ 使 $"Tail"(delta) <= (1\/2) sigma_0 I_0(T)$；再由 (ii) 及 $theta.alt >= beta > 0$，取充分大的 $M > 0$ 使 $A_M >= max{1, B(delta)}$。将区间分解为 $[0, T] = [0, T - delta] union [T - delta, T]$：
@@ -300,7 +302,7 @@ $ <eq:general-exp-lower>
   $
   其在 $[T - delta, T]$ 上的积分恰为 $-"Tail"(delta)$。
 
-代入 @eq:general-exp-lower 即得
+舍去 $(c_0 T^3) \/ 3 >= 0$（当 $sigma_0 = 0$ 且 $c_0 > 0$ 时则予以保留）并代入 @eq:general-exp-lower 即得
 $
   -lambda cal(M)_T - 1/2 lambda^2 chevron.l cal(M) chevron.r_T >= lambda ( sigma_0 I_0(T) - "Tail"(delta) ) >= 1/2 lambda sigma_0 I_0(T) =: epsilon.alt_0 > 0, quad hat(QQ)_M"-a.s."
 $

@@ -1461,4 +1461,80 @@ theorem general_kernel_theorem_3 (g : GeneralKernelParams)
 
 end Theorem3GeneralKernels
 
+/-! ## Section 5: Interface Non-Vacuity & Layer 2 Consistency Checks -/
+
+section NonVacuityChecks
+
+/-- **Non-vacuity witness 1 (Strict-local-martingale regime)**:
+    Both `VolterraMartingaleInterface p` and `GeneralVolterraMartingaleInterface g`
+    are inhabited whenever `E_Q[S_T] < S_0` (e.g. `E_S_T = 0 < 1 = S₀`). -/
+noncomputable example (p : ModelParams) : VolterraMartingaleInterface p where
+  Ω := Unit
+  E_S_T := 0
+  S₀ := 1
+  supermartingale_le := by norm_num
+  tilted_system hEq := False.elim (by norm_num at hEq)
+
+noncomputable example (g : GeneralKernelParams) : GeneralVolterraMartingaleInterface g where
+  Ω := Unit
+  E_S_T := 0
+  S₀ := 1
+  supermartingale_le := by norm_num
+  tilted_system hEq := False.elim (by norm_num at hEq)
+
+/-- **Non-vacuity witness 2 (Internal consistency at `σ₀ = 0, c₀ = 0`)**:
+    Keeping `q > 0`, `lam > 0`, `ϑ > 0`, `T > 0`, `A_M`, and `W₂` completely arbitrary
+    while relaxing only `0 < σ₀` (matching the trivial martingale `σ ≡ 0, S ≡ S₀`
+    in the Remark), all four inner requirements (a)–(d) of `tilted_system` hold
+    simultaneously for `σ ≡ 0`, `M_T ≡ 0`, `Good = Set.univ`. Thus no hidden
+    inconsistency exists in the Layer 2 identities without `0 < σ₀` (or `0 < c₀`). -/
+example (T q lam ϑ A_M : ℝ) (W₂ : ℝ → ℝ) :
+    ∃ (Ω : Type) (E_M : (Ω → ℝ) → ℝ) (σ : Ω → ℝ → ℝ) (M_T : Ω → ℝ) (Good : Set Ω),
+      (∀ ω ∈ Good, ContinuousOn (σ ω) (Icc 0 T) ∧ ∀ u ∈ Icc 0 T, 0 ≤ σ ω u) ∧
+      (∀ ω ∈ Good,
+        -M_T ω =
+          (0 : ℝ) * (∫ s in (0 : ℝ)..T, W₂ s) + (0 : ℝ) * T ^ 3 / 3 +
+          ∫ s in (0 : ℝ)..T,
+            (q * (T - s) ^ 2 * (σ ω s) ^ 2 + (A_M * (T - s) ^ 2 - W₂ s) * σ ω s)) ∧
+      E_M (fun ω => Real.exp (-(lam * M_T ω) -
+          (1 / 2) * lam ^ 2 * ϑ ^ 2 *
+            (∫ u in (0 : ℝ)..T, (T - u) ^ 4 * (σ ω u) ^ 2))) ≤ 1 ∧
+      (∀ (c : ℝ) (X : Ω → ℝ), (∀ ω ∈ Good, c ≤ X ω) → c ≤ E_M X) := by
+  refine ⟨Unit, fun X => X (), fun _ _ => 0, fun _ => 0, Set.univ, ?_, ?_, ?_, ?_⟩
+  · intro _ _
+    exact ⟨continuousOn_const, fun _ _ => le_rfl⟩
+  · intro _ _
+    simp
+  · simp
+  · intro c X h
+    exact h () trivial
+
+/-- **Non-vacuity witness 3 (Internal consistency on the martingale boundary `β = κ₂`, `q = 0`)**:
+    Keeping `σ₀ > 0`, `c₀ ≥ 0`, `T > 0`, `A_M`, and `W₂` arbitrary while setting `q = 0`
+    (`lam = 0`), all four inner requirements (a)–(d) hold simultaneously. Hence
+    contradictions in Theorems 1 and 3 genuinely require `β > κ₂` (`q > 0`). -/
+example (T σ₀ c₀ ϑ A_M : ℝ) (W₂ : ℝ → ℝ) :
+    ∃ (Ω : Type) (E_M : (Ω → ℝ) → ℝ) (σ : Ω → ℝ → ℝ) (M_T : Ω → ℝ) (Good : Set Ω),
+      (∀ ω ∈ Good, ContinuousOn (σ ω) (Icc 0 T) ∧ ∀ u ∈ Icc 0 T, 0 ≤ σ ω u) ∧
+      (∀ ω ∈ Good,
+        -M_T ω =
+          σ₀ * (∫ s in (0 : ℝ)..T, W₂ s) + c₀ * T ^ 3 / 3 +
+          ∫ s in (0 : ℝ)..T,
+            ((0 : ℝ) * (T - s) ^ 2 * (σ ω s) ^ 2 + (A_M * (T - s) ^ 2 - W₂ s) * σ ω s)) ∧
+      E_M (fun ω => Real.exp (-((0 : ℝ) * M_T ω) -
+          (1 / 2) * (0 : ℝ) ^ 2 * ϑ ^ 2 *
+            (∫ u in (0 : ℝ)..T, (T - u) ^ 4 * (σ ω u) ^ 2))) ≤ 1 ∧
+      (∀ (c : ℝ) (X : Ω → ℝ), (∀ ω ∈ Good, c ≤ X ω) → c ≤ E_M X) := by
+  refine ⟨Unit, fun X => X (), fun _ _ => 0,
+    fun _ => -(σ₀ * (∫ s in (0 : ℝ)..T, W₂ s) + c₀ * T ^ 3 / 3), Set.univ, ?_, ?_, ?_, ?_⟩
+  · intro _ _
+    exact ⟨continuousOn_const, fun _ _ => le_rfl⟩
+  · intro _ _
+    simp [neg_neg]
+  · simp
+  · intro c X h
+    exact h () trivial
+
+end NonVacuityChecks
+
 end RoughLogSVConjecture45

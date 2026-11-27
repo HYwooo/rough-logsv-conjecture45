@@ -60,10 +60,12 @@ In this paper we prove Conjecture 4.5, recover the classical $H = 1\/2$ diffusio
 Combining Theorem 1 with #cite(<sepp2026rough>, form: "prose", supplement: [Theorem 4.3]) gives the characterization of martingality across the full Hurst range $H in (0, 1\/2]$:
 
 #thmblock("Corollary 2 (Exact Martingality Boundary)")[
-  Under the parameter assumptions of Theorem 1, for every $H in (0, 1\/2]$ and every $T > 0$, the forward price $S$ in @eq:model is a true $QQ$-martingale on $[0, T]$ if and only if $kappa_2 >= beta$.
+  Under the shared parameter assumptions of Theorem 1 and #cite(<sepp2026rough>, form: "prose", supplement: [Theorem 4.3]) (in particular, $H in (0, 1\/2]$, $sigma_0 > 0$, $theta > 0$, $kappa_1 >= 0$, $kappa_2 >= 0$, $epsilon.alt >= 0$, and $beta in RR$; at $H = 1\/2$, see also #cite(<sepp2023lognormal>, form: "prose", supplement: [Theorem 3.7])), for every $T > 0$ the forward price $S$ in @eq:model is a true $QQ$-martingale on $[0, T]$ if and only if $kappa_2 >= beta$.
 ]
 
-*Remark (Positivity and boundary-drift assumptions).* Theorem 1 does not rely on strict positivity of $sigma_t$ (#cite(<sepp2026rough>, form: "prose", supplement: [Conjecture 2.3])); it requires only almost-sure non-negativity $sigma_t >= 0$, which is already established in #cite(<sepp2026rough>, form: "prose", supplement: [Theorem 2.2]). Moreover, the condition $c_0 >= 0$ is convenient rather than essential. If a continuous non-negative solution exists with $c_0 < 0$ and $EE_QQ[S_T] = S_0$, then the supermartingale property gives $EE_QQ[S_t] = S_0$ for all $t in (0, T]$. Since $3 - alpha < 3$ for every $alpha in (1\/2, 1]$, choosing $t in (0, T]$ sufficiently small ensures $2 sigma_0 t^(3 - alpha) \/ Gamma(4 - alpha) + c_0 t^3 \/ 3 > 0$, and applying the same proof on $[0, t]$ yields a contradiction.
+*Proof.* Necessity ($kappa_2 >= beta$) holds across all parameter assumptions of Theorem 1 for every $H in (0, 1\/2]$. Sufficiency is established by #cite(<sepp2026rough>, form: "prose", supplement: [Theorem 4.3]) (and at the classical diffusion endpoint $H = 1\/2$ by #cite(<sepp2023lognormal>, form: "prose", supplement: [Theorem 3.7])). #h(1fr) $square$
+
+*Remark (Positivity, initial-volatility degeneracy, and boundary-drift assumptions).* Theorem 1 does not rely on strict positivity of $sigma_t$ (#cite(<sepp2026rough>, form: "prose", supplement: [Conjecture 2.3])); it requires only almost-sure non-negativity $sigma_t >= 0$, which is already established in #cite(<sepp2026rough>, form: "prose", supplement: [Theorem 2.2]). Notice that when $sigma_0 = kappa_1 = 0$ (so $c_0 = 0$), the trivial solution $sigma equiv 0$ and $S equiv S_0$ is a true martingale even for $beta > kappa_2$, showing that $sigma_0 > 0$ and $c_0 > 0$ cannot vanish simultaneously. On the other hand, if a continuous global non-negative solution exists with $sigma_0 = 0$ and $c_0 = kappa_1 theta > 0$, retaining the positive constant term $(c_0 T^3) \/ 3 > 0$ in @eq:exp-lower (and likewise in @eq:general-exp-lower for Theorem 3) yields the same contradiction without changing the remainder of the argument. Moreover, the condition $c_0 >= 0$ is convenient rather than essential. If a continuous non-negative solution exists with $c_0 < 0$ and $EE_QQ[S_T] = S_0$, then the supermartingale property gives $EE_QQ[S_t] = S_0$ for all $t in (0, T]$. Since $3 - alpha < 3$ for every $alpha in (1\/2, 1]$, choosing $t in (0, T]$ sufficiently small ensures $2 sigma_0 t^(3 - alpha) \/ Gamma(4 - alpha) + c_0 t^3 \/ 3 > 0$, and applying the same proof on $[0, t]$ yields a contradiction.
 
 = Proof of Theorem 1
 
@@ -75,7 +77,7 @@ Since $sigma$ is continuous on $[0, T]$ $QQ$-a.s., we have $integral_0^T sigma_s
 $
   hat(B)_t := W_t^sigma - (beta / theta.alt) integral_0^t sigma_s dif s, quad t in [0, T],
 $
-is a standard $hat(QQ)$-Brownian motion, and $hat(sigma) := sigma$ is a $hat(QQ)$-a.s. continuous, finite, non-negative process on $[0, T]$ solving
+is a standard $hat(QQ)$-Brownian motion. For each fixed $t in [0, T]$, continuity of $sigma$ and $K in L^2([0, T])$ give $integral_0^t K(t-s)^2 sigma_s^2 dif s < infinity$ $QQ$-a.s. Localizing by $tau_n := inf{ u in [0, T] : sigma_u >= n } and T$, Girsanov's theorem and the invariance of stochastic integrals under equivalent changes of measure preserve the Volterra equation for each $t in [0, T]$ almost surely (and hence simultaneously on $[0, T]$ by sample-path continuity of $hat(sigma) := sigma$). Thus $hat(sigma)$ is a $hat(QQ)$-a.s. continuous, finite, non-negative process on $[0, T]$ solving
 $
   hat(sigma)_t = sigma_0 + integral_0^t K(t-s) [ c_0 + c_1 hat(sigma)_s + q hat(sigma)_s^2 ] dif s + integral_0^t K(t-s) theta.alt hat(sigma)_s dif hat(B)_s.
 $
@@ -84,7 +86,7 @@ Now fix an arbitrary constant $M > 0$ such that $A_M := c_1 + theta.alt M > 0$, 
 $
   (dif hat(QQ)_M) / (dif hat(QQ)) bar_(cal(F)_T) := exp( M hat(B)_T - 1/2 M^2 T ).
 $
-Because $M$ is deterministic, Novikov's condition holds, so $hat(QQ)_M$ is a probability measure equivalent to $QQ$ on $cal(F)_T$ and $hat(B)_t^M := hat(B)_t - M t$ is a standard $hat(QQ)_M$-Brownian motion. By invariance of stochastic integrals under equivalent changes of measure, under $hat(QQ)_M$ the same continuous non-negative process $hat(sigma)$ satisfies
+Because $M$ is deterministic, Novikov's condition holds, so $hat(QQ)_M$ is a probability measure equivalent to $QQ$ on $cal(F)_T$ and $hat(B)_t^M := hat(B)_t - M t$ is a standard $hat(QQ)_M$-Brownian motion. By the same localization and invariance of stochastic integrals under equivalent changes of measure, under $hat(QQ)_M$ the same continuous non-negative process $hat(sigma)$ satisfies
 $
   hat(sigma)_t = sigma_0 + integral_0^t K(t-s) [ c_0 + A_M hat(sigma)_s + q hat(sigma)_s^2 ] dif s + integral_0^t K(t-s) theta.alt hat(sigma)_s dif hat(B)_s^M, quad t in [0, T].
 $ <eq:tilted>
@@ -102,7 +104,7 @@ $
     delta_0(dif s) & "if " alpha = 1.
   )
 $
-For each $n >= 1$, let $tau_n := inf{ t in [0, T] : hat(sigma)_t >= n } and T$, and define the stopped semimartingale $Z_t^(tau_n) := Z_(t and tau_n)$ and convolved process $X_t^((n)) := (K * dif Z^(tau_n))_t$. Because $hat(sigma)_s <= n$ on $[0, tau_n]$, the drift and diffusion integrands of $Z^(tau_n)$ are uniformly bounded. Applying the stochastic Fubini lemma of #cite(<abijaber2019affine>, form: "prose", supplement: [Lemma 2.6]) yields $(L * X^((n)))_t = ((L * K) * dif Z^(tau_n))_t = Z_t^(tau_n)$ for all $t in [0, T]$, $hat(QQ)_M$-a.s. By locality of the stochastic integral, on the event ${tau_n = T}$ we have $X_u^((n)) = hat(sigma)_u - sigma_0$ and $Z_u^(tau_n) = Z_u$ for every $u in [0, T]$. Since $hat(sigma)$ is continuous on $[0, T]$ $hat(QQ)_M$-a.s., the union $union.big_(n >= 1) {tau_n = T}$ has full $hat(QQ)_M$-measure, giving the pathwise inversion
+For each $n >= 1$, let $tau_n := inf{ t in [0, T] : hat(sigma)_t >= n } and T$, and define the stopped semimartingale $Z_t^(tau_n) := Z_(t and tau_n)$ together with a jointly measurable version of the convolved process $X_t^((n)) := (K * dif Z^(tau_n))_t$. Because $hat(sigma)_s <= n$ on $[0, tau_n]$, the drift and diffusion integrands of $Z^(tau_n)$ are uniformly bounded. Applying the stochastic Fubini lemma of #cite(<abijaber2019affine>, form: "prose", supplement: [Lemma 2.6]) yields $(L * X^((n)))_t = ((L * K) * dif Z^(tau_n))_t = Z_t^(tau_n)$ for Lebesgue-a.e. $t in [0, T]$, $hat(QQ)_M$-a.s. Moreover, by locality of the stochastic integral, for each fixed $u in [0, T]$ we have $X_u^((n)) = hat(sigma)_u - sigma_0$ and $Z_u^(tau_n) = Z_u$ $hat(QQ)_M$-a.s. on ${tau_n = T}$. By Tonelli's theorem on the product space $Omega times [0, T]$, on ${tau_n = T}$ these equalities hold for Lebesgue-a.e. $u in [0, T]$, $hat(QQ)_M$-a.s. Since $L$ is a finite non-negative Borel measure on $[0, T]$, convolution with $L$ preserves Lebesgue-null sets (by Tonelli's theorem, including when $L$ has an atom at $0$). Taking $union.big_(n >= 1) {tau_n = T}$—which has full $hat(QQ)_M$-measure by path continuity of $hat(sigma)$—yields $Z_t = (L * (hat(sigma) - sigma_0))_t$ for Lebesgue-a.e. $t in [0, T]$, $hat(QQ)_M$-a.s. Because $Z$ is continuous and the zero-extension $u |-> (hat(sigma)_u - sigma_0) bb(1)_({u >= 0})$ is continuous on $RR$ (as $hat(sigma)_0 - sigma_0 = 0$), the right-hand side is continuous in $t in [0, T]$ by dominated convergence, giving the pathwise inversion
 $
   Z_t = (L * (hat(sigma) - sigma_0))_t = integral_([0, t]) (hat(sigma)_(t-r) - sigma_0) L(dif r), quad forall t in [0, T], quad hat(QQ)_M"-a.s."
 $ <eq:Z-inv>
@@ -140,9 +142,9 @@ $
   1/2 lambda^2 chevron.l cal(M) chevron.r_T &= 1/2 lambda^2 theta.alt^2 integral_0^T (T - u)^4 hat(sigma)_u^2 dif u \
   &<= 1/2 lambda^2 theta.alt^2 T^2 integral_0^T (T - u)^2 hat(sigma)_u^2 dif u = (lambda q) / 2 integral_0^T (T - u)^2 hat(sigma)_u^2 dif u.
 $
-Combining this bound with @eq:pathwise and dropping $c_0 T^3 \/ 3 >= 0$ gives, $hat(QQ)_M$-a.s.,
+Combining this bound with @eq:pathwise gives, $hat(QQ)_M$-a.s.,
 $
-  -lambda cal(M)_T - 1/2 lambda^2 chevron.l cal(M) chevron.r_T >= lambda [ & (2 sigma_0 T^(3 - alpha)) / Gamma(4 - alpha) + integral_0^T ( q/2 (T - u)^2 hat(sigma)_u^2 \
+  -lambda cal(M)_T - 1/2 lambda^2 chevron.l cal(M) chevron.r_T >= lambda [ & (2 sigma_0 T^(3 - alpha)) / Gamma(4 - alpha) + (c_0 T^3) / 3 + integral_0^T ( q/2 (T - u)^2 hat(sigma)_u^2 \
     & + ( A_M (T - u)^2 - (2 (T - u)^(2 - alpha)) / Gamma(3 - alpha) ) hat(sigma)_u ) dif u ].
 $ <eq:exp-lower>
 
@@ -167,7 +169,7 @@ Choose $M$ large enough so that $A_M > 0$ and $delta_M <= T$, and split $[0, T] 
     - 2 / (q Gamma(3 - alpha)^2) integral_(T - delta_M)^T (T - u)^(1 - 2 H) dif u = - delta_M^(2 - 2 H) / (q (1 - H) Gamma(5/2 - H)^2).
   $
 
-Substituting both estimates into @eq:exp-lower gives the deterministic pathwise lower bound ($hat(QQ)_M$-a.s.):
+Dropping $(c_0 T^3) \/ 3 >= 0$ and substituting both estimates into @eq:exp-lower gives the deterministic pathwise lower bound ($hat(QQ)_M$-a.s.):
 $
   -lambda cal(M)_T - 1/2 lambda^2 chevron.l cal(M) chevron.r_T >= lambda [ (2 sigma_0 T^(5/2 - H)) / Gamma(7/2 - H) - delta_M^(2 - 2 H) / (q (1 - H) Gamma(5/2 - H)^2) ].
 $ <eq:final-bound>
@@ -232,14 +234,14 @@ and its total mass $I_0(T) := integral_0^T W_2(s) dif s$.
 
 We now prove $EE_QQ[S_T] < S_0$ by contradiction. Suppose $EE_QQ[S_T] = S_0$. Repeating Step 1 of Section 3 verbatim produces, for any constant $M > 0$ with $A_M := c_1 + theta.alt M > 0$, an equivalent probability measure $hat(QQ)_M tilde QQ$ and standard $hat(QQ)_M$-Brownian motion $hat(B)^M$ under which $hat(sigma)$ is continuous and non-negative on $[0, T]$ and satisfies $hat(sigma) - sigma_0 = K * dif Z$ with $Z$ given by Equation (8).
 
-Because $K in L^2([0, T])$ and $L$ is a finite non-negative measure on $[0, T]$ with $K * L equiv 1$, the localization argument of Step 2 via $tau_n = inf{ t in [0, T] : hat(sigma)_t >= n } and T$ and #cite(<abijaber2019affine>, form: "prose", supplement: [Lemma 2.6]) applies unchanged and yields $Z_t = integral_([0, t]) (hat(sigma)_(t - r) - sigma_0) L(dif r)$ for all $t in [0, T]$, $hat(QQ)_M$-a.s. Integrating by parts against $phi(u) = (T - u)^2$ gives $integral_0^T (T - u)^2 dif Z_u = 2 integral_0^T (T - u) Z_u dif u$. Applying Fubini's theorem (justified pathwise by continuity of $hat(sigma)$ on $[0, T]$ and $L([0, T]) < infinity$) with $s = u - r$:
+Because $K in L^2([0, T])$ and $L$ is a finite non-negative measure on $[0, T]$ with $K * L equiv 1$, the Step 2 localization argument—taking a jointly measurable version of $X^((n)) := (K * dif Z^(tau_n))$ on $[0, T]$ with $tau_n = inf{ t in [0, T] : hat(sigma)_t >= n } and T$, applying #cite(<abijaber2019affine>, form: "prose", supplement: [Lemma 2.6]), Tonelli's theorem on $Omega times [0, T]$, and continuity at $t in [0, T]$ via $hat(sigma)_0 - sigma_0 = 0$ and dominated convergence—applies unchanged and yields $Z_t = integral_([0, t]) (hat(sigma)_(t - r) - sigma_0) L(dif r)$ for all $t in [0, T]$, $hat(QQ)_M$-a.s. Integrating by parts against $phi(u) = (T - u)^2$ gives $integral_0^T (T - u)^2 dif Z_u = 2 integral_0^T (T - u) Z_u dif u$. Applying Fubini's theorem (justified pathwise by continuity of $hat(sigma)$ on $[0, T]$ and $L([0, T]) < infinity$) with $s = u - r$:
 $
   2 integral_0^T (T - u) integral_([0, u]) (hat(sigma)_(u - r) - sigma_0) L(dif r) dif u &= integral_0^T (hat(sigma)_s - sigma_0) ( 2 integral_([0, T - s]) (T - s - r) L(dif r) ) dif s \
   &= integral_0^T W_2(s) (hat(sigma)_s - sigma_0) dif s.
 $
 Isolating $-cal(M)_T$ and combining with the Doléans--Dade supermartingale bound @eq:fatou and quadratic-variation domination $(1\/2) lambda^2 chevron.l cal(M) chevron.r_T <= (lambda q \/ 2) integral_0^T (T - u)^2 hat(sigma)_u^2 dif u$ (where $lambda = q \/ (theta.alt^2 T^2)$) gives, $hat(QQ)_M$-a.s.,
 $
-  -lambda cal(M)_T - 1/2 lambda^2 chevron.l cal(M) chevron.r_T >= lambda [ & sigma_0 I_0(T) + integral_0^T ( q / 2 (T - u)^2 hat(sigma)_u^2 \
+  -lambda cal(M)_T - 1/2 lambda^2 chevron.l cal(M) chevron.r_T >= lambda [ & sigma_0 I_0(T) + (c_0 T^3) / 3 + integral_0^T ( q / 2 (T - u)^2 hat(sigma)_u^2 \
     & + (A_M (T - u)^2 - W_2(u)) hat(sigma)_u ) dif u ].
 $ <eq:general-exp-lower>
 Now fix $delta in (0, T)$ small enough that $"Tail"(delta) <= (1\/2) sigma_0 I_0(T)$ (possible by (i) and (iii)), and choose $M > 0$ large enough that $A_M >= max{1, B(delta)}$ (possible by (ii) since $theta.alt >= beta > 0$). Splitting $[0, T] = [0, T - delta] union [T - delta, T]$:
@@ -250,7 +252,7 @@ Now fix $delta in (0, T)$ small enough that $"Tail"(delta) <= (1\/2) sigma_0 I_0
   $
   whose integral over $[T - delta, T]$ is $-"Tail"(delta)$.
 
-Substituting into @eq:general-exp-lower yields
+Dropping $(c_0 T^3) \/ 3 >= 0$ (or keeping it when $sigma_0 = 0$ and $c_0 > 0$) and substituting into @eq:general-exp-lower yields
 $
   -lambda cal(M)_T - 1/2 lambda^2 chevron.l cal(M) chevron.r_T >= lambda ( sigma_0 I_0(T) - "Tail"(delta) ) >= 1/2 lambda sigma_0 I_0(T) =: epsilon.alt_0 > 0, quad hat(QQ)_M"-a.s."
 $

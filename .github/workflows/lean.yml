@@ -1,0 +1,25 @@
+name: Lean 4 CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: leanprover/lean-action@v1
+        with:
+          build-args: ""
+      - name: Audit axioms
+        run: |
+          lake env lean --stdin <<'EOF'
+          import RoughLogSVConjecture45
+          #print axioms RoughLogSVConjecture45.conjecture_4_5
+          #print axioms RoughLogSVConjecture45.general_kernel_theorem_3
+          #print axioms RoughLogSVConjecture45.GeneralKernelParams.I₀_pos
+          #print axioms RoughLogSVConjecture45.GeneralKernelParams.tail_le
+          EOF
