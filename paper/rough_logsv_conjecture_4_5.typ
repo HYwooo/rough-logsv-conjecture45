@@ -38,7 +38,7 @@ $
 $ <eq:kernel>
 Setting $theta.alt := sqrt(beta^2 + epsilon.alt^2)$ and $theta.alt dif W_t^sigma := beta dif W_t^((0)) + epsilon.alt dif W_t^((1))$, the drift polynomial takes the form $c_0 + c_1 sigma - kappa_2 sigma^2$ with $c_0 := kappa_1 theta >= 0$ and $c_1 := kappa_2 theta - kappa_1 in RR$.
 
-A central question for derivative pricing under positive spot--volatility correlation ($beta > 0$) is when the discounted price $S$ is a true $QQ$-martingale rather than a strict local martingale (a financial bubble). #cite(<sepp2026rough>, form: "prose", supplement: [Theorem 4.3]) prove that $kappa_2 >= beta$ is *sufficient* for $S$ to be a true $QQ$-martingale on every finite horizon $[0, T]$ for all $H in (0, 1\/2]$. For smooth finite exponential mixtures $K^N(t) = sum_(i=1)^N w_i e^(-x_i t)$ (where $K^N(0) < infinity$), they also prove *necessity* #cite(<sepp2026rough>, supplement: [Proposition 4.4]) by invoking the differential semimartingale decomposition of #cite(<bondi2026feller>, form: "prose"); see also #cite(<guyon2026martingale>, form: "prose"). Because the singular fractional kernel satisfies $K(0) = infinity$ for $H < 1\/2$, the volatility $sigma_t$ is not a semimartingale and differential Feller tests do not apply. #cite(<sepp2026rough>, form: "prose") therefore leave the converse open as *Conjecture 4.5*: for $H in (0, 1\/2)$, does $beta > kappa_2$ imply $EE_QQ[S_T] < S_0$ for every $T > 0$?
+A central question for derivative pricing under positive spot--volatility correlation ($beta > 0$) is when the discounted price $S$ is a true $QQ$-martingale rather than a strict local martingale (a financial bubble). #cite(<sepp2026rough>, form: "prose", supplement: [Theorem 4.3]) prove that $kappa_2 >= beta$ is *sufficient* for $S$ to be a true $QQ$-martingale on every finite horizon $[0, T]$ for all $H in (0, 1\/2]$. For smooth finite exponential mixtures $K^N(t) = sum_(i=1)^N w_i e^(-x_i t)$ (where $K^N(0) < infinity$), they also prove *necessity* #cite(<sepp2026rough>, supplement: [Proposition 4.4]) by invoking the differential semimartingale decomposition of #cite(<bondi2026feller>, form: "prose")\; see also #cite(<guyon2026martingale>, form: "prose"). Because the singular fractional kernel satisfies $K(0) = infinity$ for $H < 1\/2$, the volatility $sigma_t$ is not a semimartingale and differential Feller tests do not apply. #cite(<sepp2026rough>, form: "prose") therefore leave the converse open as *Conjecture 4.5*: for $H in (0, 1\/2)$, does $beta > kappa_2$ imply $EE_QQ[S_T] < S_0$ for every $T > 0$?
 
 In this note we prove Conjecture 4.5 in full, and simultaneously recover the classical $H = 1\/2$ diffusion case #cite(<sepp2023lognormal>, supplement: [Theorem 3.7]) within a single unified framework. Our proof combines four elementary ingredients:
 + *Share-measure reduction*: assuming $EE_QQ[S_T] = S_0$ yields an equivalent measure $hat(QQ) tilde QQ$ under which the quadratic drift flips sign to $+q hat(sigma)_s^2$ with $q := beta - kappa_2 > 0$.
@@ -58,7 +58,7 @@ In this note we prove Conjecture 4.5 in full, and simultaneously recover the cla
 Combining Theorem 1 with #cite(<sepp2026rough>, form: "prose", supplement: [Theorem 4.3]) gives the complete characterization of martingality across the entire Hurst range $H in (0, 1\/2]$:
 
 #thmblock("Corollary 2 (Exact Martingality Boundary)")[
-  For every $H in (0, 1\/2]$ and every $T > 0$, the forward price $S$ in @eq:model is a true $QQ$-martingale on $[0, T]$ if and only if $kappa_2 >= beta$.
+  Under the parameter assumptions of Theorem 1, for every $H in (0, 1\/2]$ and every $T > 0$, the forward price $S$ in @eq:model is a true $QQ$-martingale on $[0, T]$ if and only if $kappa_2 >= beta$.
 ]
 
 *Remark (Positivity and boundary-drift assumptions).* Theorem 1 does not rely on strict positivity of $sigma_t$ (#cite(<sepp2026rough>, form: "prose", supplement: [Conjecture 2.3])); it requires only almost-sure non-negativity $sigma_t >= 0$, which is already established in #cite(<sepp2026rough>, form: "prose", supplement: [Theorem 2.2]). Moreover, the condition $c_0 >= 0$ is convenient rather than essential: if a continuous non-negative solution exists with $c_0 < 0$ and $EE_QQ[S_T] = S_0$, then the supermartingale property implies $EE_QQ[S_t] = S_0$ for all $t in (0, T]$; since $3 - alpha < 3$ for every $alpha in (1\/2, 1]$, choosing $t in (0, T]$ sufficiently small ensures $2 sigma_0 t^(3 - alpha) \/ Gamma(4 - alpha) + c_0 t^3 \/ 3 > 0$, and the same proof on $[0, t]$ yields a contradiction.
@@ -102,7 +102,7 @@ $
 $
 For each $n >= 1$, let $tau_n := inf{ t in [0, T] : hat(sigma)_t >= n } and T$, and consider the stopped semimartingale $Z_t^(tau_n) := Z_(t and tau_n)$ together with the convolved process $X_t^((n)) := (K * dif Z^(tau_n))_t$. Because $hat(sigma)_s <= n$ on $[0, tau_n]$, the drift and diffusion integrands of $Z^(tau_n)$ are uniformly bounded; applying the stochastic Fubini lemma of #cite(<abijaber2019affine>, form: "prose", supplement: [Lemma 2.6]) yields $(L * X^((n)))_t = ((L * K) * dif Z^(tau_n))_t = Z_t^(tau_n)$ for all $t in [0, T]$, $hat(QQ)_M$-a.s. By locality of the stochastic integral, on the event ${tau_n = T}$ we have $X_u^((n)) = hat(sigma)_u - sigma_0$ and $Z_u^(tau_n) = Z_u$ for every $u in [0, T]$. Since $hat(sigma)$ is continuous on $[0, T]$ $hat(QQ)_M$-a.s., we have $union.big_(n >= 1) {tau_n = T}$ of full $hat(QQ)_M$-measure, which gives the pathwise inversion
 $
-  Z_t = (L * (hat(sigma) - sigma_0))_t = integral_([0, t]) (hat(sigma)_(t-s) - sigma_0) L(dif s), quad forall t in [0, T], quad hat(QQ)_M"-a.s."
+  Z_t = (L * (hat(sigma) - sigma_0))_t = integral_([0, t]) (hat(sigma)_(t-r) - sigma_0) L(dif r), quad forall t in [0, T], quad hat(QQ)_M"-a.s."
 $ <eq:Z-inv>
 
 Next, introduce the deterministic quadratic test function $phi(u) := (T - u)^2$ on $[0, T]$ and the continuous $hat(QQ)_M$-local martingale
@@ -113,7 +113,7 @@ Since $phi(T) = 0$, $phi'(u) = -2(T - u)$, and $Z_0 = 0$, Itô's integration-by-
 $
   integral_0^T (T - u)^2 dif Z_u = 2 integral_0^T (T - u) Z_u dif u.
 $ <eq:ibp>
-Evaluating the right-hand side of @eq:ibp using @eq:Z-inv and Fubini's theorem (valid pathwise since $hat(sigma)$ is continuous on $[0, T]$ and $L([0, T]) < infinity$) produces the *exact same formula* for both $alpha < 1$ and $alpha = 1$:
+Evaluating the right-hand side of @eq:ibp via @eq:Z-inv and Fubini's theorem (valid pathwise since $hat(sigma)$ is continuous on $[0, T]$ and $L([0, T]) < infinity$), and changing variables $s = u - r$ ($r = u - s in [0, u]$) for the time coordinate of $hat(sigma)_s - sigma_0$, produces the *exact same formula* for both $alpha < 1$ and $alpha = 1$:
 - For $alpha in (1\/2, 1)$:
   $
     2 integral_s^T (T - u) (u - s)^(-alpha) / Gamma(1 - alpha) dif u = 2 (T - s)^(2 - alpha) / Gamma(1 - alpha) Beta(2, 1 - alpha) = 2 (T - s)^(2 - alpha) / Gamma(3 - alpha).
@@ -122,23 +122,26 @@ Evaluating the right-hand side of @eq:ibp using @eq:Z-inv and Fubini's theorem (
 
 Integrating the constant $-sigma_0$ term gives $integral_0^T 2 (T - s)^(2 - alpha)\/Gamma(3 - alpha) dif s = 2 T^(3 - alpha)\/Gamma(4 - alpha)$. Substituting into @eq:ibp and isolating $-cal(M)_T$ yields the exact pathwise identity ($hat(QQ)_M$-a.s.):
 $
-  -cal(M)_T = (2 sigma_0 T^(3 - alpha)) / Gamma(4 - alpha) + (c_0 T^3) / 3 + integral_0^T [ q (T - u)^2 hat(sigma)_u^2 + ( A_M (T - u)^2 - (2 (T - u)^(2 - alpha)) / Gamma(3 - alpha) ) hat(sigma)_u ] dif u.
+  -cal(M)_T = (2 sigma_0 T^(3 - alpha)) / Gamma(4 - alpha) + (c_0 T^3) / 3 + integral_0^T [ & q (T - u)^2 hat(sigma)_u^2 \
+    & + ( A_M (T - u)^2 - (2 (T - u)^(2 - alpha)) / Gamma(3 - alpha) ) hat(sigma)_u ] dif u.
 $ <eq:pathwise>
 
 == Step 3: Doléans--Dade exponential supermartingale
 
-Set $lambda := q \/ (theta.alt^2 T^2) > 0$. For each $n >= 1$, the stopped quadratic variation satisfies $chevron.l cal(M) chevron.r_(tau_n) <= theta.alt^2 n^2 T^5 \/ 5 < infinity$, so the stopped Doléans--Dade exponential $cal(E)_(t and tau_n)(-lambda cal(M)) := exp(-lambda cal(M)_(t and tau_n) - 1/2 lambda^2 chevron.l cal(M) chevron.r_(t and tau_n))$ is a true $hat(QQ)_M$-martingale with $EE_(hat(QQ)_M)[cal(E)_(tau_n)(-lambda cal(M))] = 1$. Since $tau_n = T$ for large $n$ almost surely and $cal(E) > 0$, Fatou's lemma yields
+Set $lambda := q \/ (theta.alt^2 T^2) > 0$. For each $n >= 1$, the stopped quadratic variation satisfies $chevron.l cal(M) chevron.r_(tau_n) <= theta.alt^2 n^2 T^5 \/ 5 < infinity$, so by Novikov's condition the stopped Doléans--Dade exponential $cal(E)_(t and tau_n)(-lambda cal(M)) := exp(-lambda cal(M)_(t and tau_n) - 1/2 lambda^2 chevron.l cal(M) chevron.r_(t and tau_n))$ is a true $hat(QQ)_M$-martingale with $EE_(hat(QQ)_M)[cal(E)_(tau_n)(-lambda cal(M))] = 1$. Since $tau_n = T$ for large $n$ almost surely and $cal(E) > 0$, Fatou's lemma yields
 $
   EE_(hat(QQ)_M)[ exp( -lambda cal(M)_T - 1/2 lambda^2 chevron.l cal(M) chevron.r_T ) ] <= 1.
 $ <eq:fatou>
 
 On $[0, T]$, we have $(T - u)^4 <= T^2 (T - u)^2$, hence by our choice of $lambda$:
 $
-  1/2 lambda^2 chevron.l cal(M) chevron.r_T = 1/2 lambda^2 theta.alt^2 integral_0^T (T - u)^4 hat(sigma)_u^2 dif u <= 1/2 lambda^2 theta.alt^2 T^2 integral_0^T (T - u)^2 hat(sigma)_u^2 dif u = (lambda q) / 2 integral_0^T (T - u)^2 hat(sigma)_u^2 dif u.
+  1/2 lambda^2 chevron.l cal(M) chevron.r_T &= 1/2 lambda^2 theta.alt^2 integral_0^T (T - u)^4 hat(sigma)_u^2 dif u \
+  &<= 1/2 lambda^2 theta.alt^2 T^2 integral_0^T (T - u)^2 hat(sigma)_u^2 dif u = (lambda q) / 2 integral_0^T (T - u)^2 hat(sigma)_u^2 dif u.
 $
 Combining this bound with @eq:pathwise and dropping $c_0 T^3 \/ 3 >= 0$ gives, $hat(QQ)_M$-a.s.,
 $
-  -lambda cal(M)_T - 1/2 lambda^2 chevron.l cal(M) chevron.r_T >= lambda [ (2 sigma_0 T^(3 - alpha)) / Gamma(4 - alpha) + integral_0^T ( q/2 (T - u)^2 hat(sigma)_u^2 + ( A_M (T - u)^2 - (2 (T - u)^(2 - alpha)) / Gamma(3 - alpha) ) hat(sigma)_u ) dif u ].
+  -lambda cal(M)_T - 1/2 lambda^2 chevron.l cal(M) chevron.r_T >= lambda [ & (2 sigma_0 T^(3 - alpha)) / Gamma(4 - alpha) + integral_0^T ( q/2 (T - u)^2 hat(sigma)_u^2 \
+    & + ( A_M (T - u)^2 - (2 (T - u)^(2 - alpha)) / Gamma(3 - alpha) ) hat(sigma)_u ) dif u ].
 $ <eq:exp-lower>
 
 == Step 4: Endpoint boundary-layer splitting and contradiction as $M -> infinity$
@@ -196,7 +199,7 @@ To illustrate how explicitly the contradiction threshold in @eq:final-bound beha
 ) <tbl:params>
 
 Two concluding remarks are in order:
-+ *General completely monotone kernels*: The proof relies only on $K$ admitting a non-negative finite first-kind resolvent $L$ on $[0, T]$ (satisfying $K * L equiv 1$) such that the induced kernel weight $W_2(s) := 2 integral_([0, T - s]) (T - s - u) L(dif u)$ satisfies (i) $integral_0^T W_2(s) dif s > 0$, (ii) $sup_(s in [0, T - delta]) W_2(s) \/ (T - s)^2 < infinity$ for every $delta in (0, T)$, and (iii) $integral_0^T W_2(s)^2 \/ (T - s)^2 dif s < infinity$. Under these conditions, for any $delta in (0, T)$ choosing $A_M >= sup_(s in [0, T - delta]) W_2(s) \/ (T - s)^2$ makes the main-interval integrand non-negative, while absolute continuity of the Lebesgue integral forces the endpoint tail $integral_(T - delta)^T W_2(s)^2 \/ (2 q (T - s)^2) dif s -> 0$ as $delta arrow.b 0$. In particular, any singular kernel with $W_2(s) = O((T - s)^(2 - alpha))$ as $s arrow.t T$ for some $alpha < 3\/2$ (including the entire range $alpha in (1\/2, 1]$) is covered, complementing #cite(<sepp2026rough>, form: "prose", supplement: [Proposition 4.4]) and the smooth-kernel criteria of #cite(<guyon2026martingale>, form: "prose").
++ *General completely monotone kernels*: The proof relies only on $K in L^2([0, T])$ admitting a non-negative finite first-kind resolvent $L$ on $[0, T]$ (satisfying $K * L equiv 1$) such that the induced kernel weight $W_2(s) := 2 integral_([0, T - s]) (T - s - u) L(dif u)$ satisfies (i) $integral_0^T W_2(s) dif s > 0$, (ii) $sup_(s in [0, T - delta]) W_2(s) \/ (T - s)^2 < infinity$ for every $delta in (0, T)$, and (iii) $integral_0^T W_2(s)^2 \/ (T - s)^2 dif s < infinity$. Under these conditions, for any $delta in (0, T)$ choosing $A_M >= sup_(s in [0, T - delta]) W_2(s) \/ (T - s)^2$ makes the main-interval integrand non-negative, while absolute continuity of the Lebesgue integral forces the endpoint tail $integral_(T - delta)^T W_2(s)^2 \/ (2 q (T - s)^2) dif s -> 0$ as $delta arrow.b 0$. In particular, any singular kernel with $W_2(s) = O((T - s)^(2 - alpha))$ as $s arrow.t T$ for some $alpha < 3\/2$ (including the entire range $alpha in (1\/2, 1]$) is covered, complementing #cite(<sepp2026rough>, form: "prose", supplement: [Proposition 4.4]) and the smooth-kernel criteria of #cite(<guyon2026martingale>, form: "prose").
 + *Remaining open questions*: Our proof settles Conjecture 4.5 (martingale necessity) without addressing #cite(<sepp2026rough>, form: "prose", supplement: [Conjecture 2.3]) (almost-sure strict positivity of $sigma_t$ for $H < 1\/2$) or the stationary distribution under quadratic drift, both of which remain open.
 
 #bibliography("bibliography.bib", title: "References")
