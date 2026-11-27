@@ -50,7 +50,10 @@ namespace RoughLogSVConjecture45
 
 /-! ## 0. Model Parameters and Derived Constants -/
 
-/-- Admissible parameter bundle matching Sepp & Rakhmonov (2026) Conjecture 4.5. -/
+/-- Admissible parameter bundle for Theorem 1 (matching Sepp & Rakhmonov (2026) Conjecture 4.5).
+    Note: The formalized proofs only require `0 ≤ c₀ = κ₁ * θ` and `ϑ = √(β^2 + ε^2) ≥ β > 0`, so
+    `0 ≤ θ` and unconstrained `ε : ℝ` are allowed here; this strictly generalizes the paper's
+    `θ > 0` and `ε ≥ 0` regime. -/
 structure ModelParams where
   H : ℝ
   σ₀ : ℝ
@@ -816,7 +819,9 @@ end Layer3MainTheorem
 section Theorem3GeneralKernels
 
 /-- Admissible parameters for Theorem 3 (arbitrary kernel with non-negative finite
-    first-kind resolvent measure `L` on `[0, T]`). -/
+    first-kind resolvent measure `L` on `[0, T]`).
+    As in `ModelParams`, `0 ≤ θ` and unconstrained `ε : ℝ` are permitted because the argument
+    uses only `0 ≤ κ₁ * θ` and `ϑ = √(β^2 + ε^2) ≥ β > 0`, strictly covering `θ > 0, ε ≥ 0`. -/
 structure GeneralKernelParams where
   σ₀ : ℝ
   κ₁ : ℝ
@@ -875,7 +880,9 @@ def W₂ (g : GeneralKernelParams) (s : ℝ) : ℝ :=
 def I₀ (g : GeneralKernelParams) : ℝ :=
   ∫ s in (0 : ℝ)..g.T, g.W₂ s
 
-/-- Uniform main-interval upper bound `2 L([0, T]) / δ` (Eq. 26). -/
+/-- Explicit finite main-interval upper envelope `2 L([0, T]) / δ` dominating the paper's
+    `B(δ) := sup_{s ∈ [0, T - δ]} W₂(s) / (T - s)^2` in Eq. (26); `W₂_le_B_bound_mul_sq`
+    verifies `W₂ s ≤ B_bound g δ * (T - s)^2` on `[0, T - δ]`. -/
 def B_bound (g : GeneralKernelParams) (δ : ℝ) : ℝ :=
   2 * g.L.real (Icc 0 g.T) / δ
 
@@ -1156,14 +1163,16 @@ lemma integrable_tail (g : GeneralKernelParams) {δ : ℝ} (hδ : δ ∈ Ioo 0 g
   rw [div_le_div_iff₀ hDen_pos g.q_pos]
   nlinarith [sq_pos_of_pos hTu_pos]
 
-lemma tail_le (g : GeneralKernelParams) {δ : ℝ} (hδ : δ ∈ Ioo 0 g.T) :
-    g.tail δ ≤ (2 * (g.L.real (Icc 0 g.T)) ^ 2 / g.q) * δ := by
+/-- **Theorem 3 (iii) Sharper Endpoint Tail Bound** (Eqs. 27 & 30):
+    `Tail(δ) ≤ (2 L([0, δ])^2 / q) * δ`. -/
+lemma tail_le_delta (g : GeneralKernelParams) {δ : ℝ} (hδ : δ ∈ Ioo 0 g.T) :
+    g.tail δ ≤ (2 * (g.L.real (Icc 0 δ)) ^ 2 / g.q) * δ := by
   unfold tail
   have hle : g.T - δ ≤ g.T := by linarith [hδ.1]
   have hInt := g.integrable_tail hδ
   have hConstInt :
-      (∫ _ in (g.T - δ)..g.T, (2 * (g.L.real (Icc 0 g.T)) ^ 2 / g.q)) =
-        (2 * (g.L.real (Icc 0 g.T)) ^ 2 / g.q) * δ := by
+      (∫ _ in (g.T - δ)..g.T, (2 * (g.L.real (Icc 0 δ)) ^ 2 / g.q)) =
+        (2 * (g.L.real (Icc 0 δ)) ^ 2 / g.q) * δ := by
     rw [intervalIntegral.integral_const, sub_sub_cancel, smul_eq_mul]
     ring
   rw [← hConstInt]
@@ -1176,16 +1185,28 @@ lemma tail_le (g : GeneralKernelParams) {δ : ℝ} (hδ : δ ∈ Ioo 0 g.T) :
   · have hsT : s ∈ Icc 0 g.T := ⟨by linarith [hs.1, hδ.2], le_of_lt hs_lt⟩
     have hTu_pos : 0 < g.T - s := sub_pos.mpr hs_lt
     have hW_nonneg : 0 ≤ g.W₂ s := g.W₂_nonneg s
-    have hW_le : g.W₂ s ≤ 2 * (g.T - s) * g.L.real (Icc 0 g.T) := by
+    have hW_le : g.W₂ s ≤ 2 * (g.T - s) * g.L.real (Icc 0 δ) := by
       have := g.W₂_le hsT
-      have hLm : g.L.real (Icc 0 (g.T - s)) ≤ g.L.real (Icc 0 g.T) :=
-        g.L_real_mono (Icc_subset_Icc_right (by linarith [hsT.1])) Subset.rfl
+      have hLm : g.L.real (Icc 0 (g.T - s)) ≤ g.L.real (Icc 0 δ) :=
+        g.L_real_mono (Icc_subset_Icc_right (by linarith [hs.1])) (Icc_subset_Icc_right (le_of_lt hδ.2))
       nlinarith
-    have hSq : (g.W₂ s) ^ 2 ≤ 4 * (g.T - s) ^ 2 * (g.L.real (Icc 0 g.T)) ^ 2 := by nlinarith
+    have hSq : (g.W₂ s) ^ 2 ≤ 4 * (g.T - s) ^ 2 * (g.L.real (Icc 0 δ)) ^ 2 := by nlinarith
     have hDen_pos : 0 < 2 * g.q * (g.T - s) ^ 2 :=
       mul_pos (mul_pos (by norm_num) g.q_pos) (sq_pos_of_pos hTu_pos)
     rw [div_le_div_iff₀ hDen_pos g.q_pos]
     nlinarith [sq_pos_of_pos hTu_pos]
+
+/-- Uniform `L([0, T])` endpoint tail envelope `Tail(δ) ≤ (2 L([0, T])^2 / q) * δ`
+    obtained by weakening `L([0, δ]) ≤ L([0, T])`; suffices for `Tail(δ) → 0` in Step 4. -/
+lemma tail_le (g : GeneralKernelParams) {δ : ℝ} (hδ : δ ∈ Ioo 0 g.T) :
+    g.tail δ ≤ (2 * (g.L.real (Icc 0 g.T)) ^ 2 / g.q) * δ := by
+  have hLm : g.L.real (Icc 0 δ) ≤ g.L.real (Icc 0 g.T) :=
+    g.L_real_mono (Icc_subset_Icc_right (le_of_lt hδ.2)) Subset.rfl
+  have hL0 : 0 ≤ g.L.real (Icc 0 δ) := by positivity
+  have hSq : (g.L.real (Icc 0 δ)) ^ 2 ≤ (g.L.real (Icc 0 g.T)) ^ 2 := by nlinarith
+  have hdiv : 2 * (g.L.real (Icc 0 δ)) ^ 2 / g.q ≤ 2 * (g.L.real (Icc 0 g.T)) ^ 2 / g.q :=
+    div_le_div_of_nonneg_right (by linarith) (le_of_lt g.q_pos)
+  exact le_trans (g.tail_le_delta hδ) (mul_le_mul_of_nonneg_right hdiv (le_of_lt hδ.1))
 
 /-- **Eq. (34) Constructive Parameter Selection (`δ`, `M`)**:
     There exist `δ ∈ (0, T)` and `M > 0` with `A_M ≥ B(δ)` and `Tail(δ) ≤ (1/2) σ₀ I₀(T)`. -/
@@ -1538,3 +1559,11 @@ example (T σ₀ c₀ ϑ A_M : ℝ) (W₂ : ℝ → ℝ) :
 end NonVacuityChecks
 
 end RoughLogSVConjecture45
+
+/-! ## Axiom Audit (expected: only `[propext, Classical.choice, Quot.sound]`) -/
+
+#print axioms RoughLogSVConjecture45.conjecture_4_5
+#print axioms RoughLogSVConjecture45.general_kernel_theorem_3
+#print axioms RoughLogSVConjecture45.GeneralKernelParams.I₀_pos
+#print axioms RoughLogSVConjecture45.GeneralKernelParams.tail_le
+#print axioms RoughLogSVConjecture45.GeneralKernelParams.tail_le_delta

@@ -69,7 +69,7 @@
   radius: 3pt,
 )[
   #set text(size: 9.5pt)
-  *摘要：* 本文完整证明了 Sepp 与 Rakhmonov（2026）关于带 Riemann--Liouville 分数阶核 $K(t) = t^(H-1\/2)\/Gamma(H+1\/2)$ 的粗糙对数正态随机波动率模型鞅性必要条件的猜想 4.5，即二次阻尼阈值 $kappa_2 >= beta$ 是资产价格成为真鞅的必要条件。通过将二次检验函数 $phi(u) = (T-u)^2$ 与核函数 $K$ 的第一类预解核配对，结合常漂移 Cameron--Martin 测度变换以及吸收二次变差的 Doléans--Dade 指数上鞅，我们证明：只要 $beta > kappa_2$ 且 $H in (0, 1\/2]$，对任意 $T > 0$ 均有 $EE_QQ[S_T] < S_0$。该证明绕开了微分 Feller 检验在 $K(0) = infinity$ 处的奇性障碍，不需要对波动率施加严格正性、矩条件或 $L log L$ 可积性假设，并由同一论证统一推得 $H = 1\/2$ 时的经典扩散情形（Sepp 与 Rakhmonov，2023，定理 3.7）。进一步地，我们将该方法推广为适用于全体非零完全单调 $L^2$ 核（涵盖 Gamma 缓和幂律核、有限与无限指数混合核以及平移幂律核）的一般性定理，并将其适用范围与微分及 Markov 型爆炸判据作了系统对比。
+  *摘要：* 本文完整证明了 Sepp 与 Rakhmonov（2026）关于带 Riemann--Liouville 分数阶核 $K(t) = t^(H-1\/2)\/Gamma(H+1\/2)$ 的粗糙对数正态随机波动率模型鞅性必要条件的猜想 4.5，即二次阻尼阈值 $kappa_2 >= beta$ 是资产价格成为真鞅的必要条件。通过将二次检验函数 $phi(u) = (T-u)^2$ 与核函数 $K$ 的第一类预解核配对，结合常漂移 Cameron--Martin 测度变换以及吸收二次变差的 Doléans--Dade 指数上鞅，我们证明：只要 $beta > kappa_2$ 且 $H in (0, 1\/2]$，对任意 $T > 0$ 均有 $EE_QQ [S_T] < S_0$。该证明绕开了微分 Feller 检验在 $K(0) = infinity$ 处的奇性障碍，不需要对波动率施加严格正性、矩条件或 $L log L$ 可积性假设，并由同一论证统一推得 $H = 1\/2$ 时的经典扩散情形（Sepp 与 Rakhmonov，2023，定理 3.7）。进一步地，我们将该方法推广为适用于全体非零完全单调 $L^2$ 核（涵盖 Gamma 缓和幂律核、有限与无限指数混合核以及平移幂律核）的一般性定理，并将其适用范围与微分及 Markov 型爆炸判据作了系统对比。
 
   #v(0.35em)
   *关键词：* 粗糙波动率；随机 Volterra 方程；严格局部鞅；二次漂移；完全单调核；检验函数法
@@ -90,20 +90,20 @@ $
 $ <eq:kernel>
 令 $theta.alt := sqrt(beta^2 + epsilon.alt^2)$ 及 $theta.alt dif W_t^sigma := beta dif W_t^((0)) + epsilon.alt dif W_t^((1))$，则漂移多项式可写为 $c_0 + c_1 sigma - kappa_2 sigma^2$，其中 $c_0 := kappa_1 theta >= 0$，$c_1 := kappa_2 theta - kappa_1 in RR$。
 
-在正的现货--波动率相关性（$beta > 0$）情形下，衍生品定价的一个关键问题是判定贴现资产价格 $S$ 究竟是真 $QQ$-鞅还是严格局部鞅（即存在金融泡沫）。#cite(<sepp2026rough>, form: "prose", supplement: [Theorem 4.3]) 证明了对于所有 $H in (0, 1\/2]$，条件 $kappa_2 >= beta$ 足以保证 $S$ 在任意有限期限 $[0, T]$ 上为真 $QQ$-鞅。对于光滑的有限指数和核 $K^N(t) = sum_(i=1)^N w_i e^(-x_i t)$（此时 $K^N(0) < infinity$），他们还利用 #cite(<bondi2026feller>, form: "prose") 的微分半鞅分解证明了该条件的必要性 #cite(<sepp2026rough>, supplement: [Proposition 4.4])；另参见 #cite(<guyon2026martingale>, form: "prose")。然而，当 $H < 1\/2$ 时奇异分数阶核满足 $K(0) = infinity$，波动率过程 $sigma_t$ 不再是半鞅，微分 Feller 检验不再适用。因此 #cite(<sepp2026rough>, form: "prose") 将其逆命题作为*猜想 4.5（Conjecture 4.5）*保留：对 $H in (0, 1\/2)$，当 $beta > kappa_2$ 时，是否对任意 $T > 0$ 均有 $EE_QQ[S_T] < S_0$？
+在正的现货--波动率相关性（$beta > 0$）情形下，衍生品定价的一个关键问题是判定贴现资产价格 $S$ 究竟是真 $QQ$-鞅还是严格局部鞅（即存在金融泡沫）。#cite(<sepp2026rough>, form: "prose", supplement: [Theorem 4.3]) 证明了对于所有 $H in (0, 1\/2]$，条件 $kappa_2 >= beta$ 足以保证 $S$ 在任意有限期限 $[0, T]$ 上为真 $QQ$-鞅。对于光滑的有限指数和核 $K^N (t) = sum_(i=1)^N w_i e^(-x_i t)$（此时 $K^N (0) < infinity$），他们还利用 #cite(<bondi2026feller>, form: "prose") 的微分半鞅分解证明了该条件的必要性 #cite(<sepp2026rough>, supplement: [Proposition 4.4])；另参见 #cite(<guyon2026martingale>, form: "prose")。然而，当 $H < 1\/2$ 时奇异分数阶核满足 $K(0) = infinity$，波动率过程 $sigma_t$ 不再是半鞅，微分 Feller 检验不再适用。因此 #cite(<sepp2026rough>, form: "prose") 将其逆命题作为*猜想 4.5（Conjecture 4.5）*保留：对 $H in (0, 1\/2)$，当 $beta > kappa_2$ 时，是否对任意 $T > 0$ 均有 $EE_QQ [S_T] < S_0$？
 
 本文证明了猜想 4.5，由同一论证统一涵盖 $H = 1\/2$ 的经典扩散情形 #cite(<sepp2023lognormal>, supplement: [Theorem 3.7])，并进一步建立适用于全体非零完全单调 $L^2$ Volterra 核的一般鞅性必要条件定理。证明结合了以下四个核心步骤：
-+ *计价单位测度归约*：反设 $EE_QQ[S_T] = S_0$，可得等价测度 $hat(QQ) tilde QQ$，使二次漂移项反号为 $+q hat(sigma)_s^2$，其中 $q := beta - kappa_2 > 0$。
++ *计价单位测度归约*：反设 $EE_QQ [S_T] = S_0$，可得等价测度 $hat(QQ) tilde QQ$，使二次漂移项反号为 $+q hat(sigma)_s^2$，其中 $q := beta - kappa_2 > 0$。
 + *常漂移 Cameron--Martin 倾斜*：通过密度 $exp(M hat(B)_T - 1/2 M^2 T)$ 构造倾斜测度 $hat(QQ)_M$，无需支集定理即可将线性漂移系数推移至 $c_1 |-> c_1 + theta.alt M -> +infinity$，从而自然处理任意短期限 $T > 0$ 与任意强的线性均值回归（$c_1 < 0$）。
 + *第一类预解核与二次检验函数*：即使 $K(0) = infinity$，将 $hat(sigma) - sigma_0$ 与第一类预解核 $L$ 作卷积仍可得到连续半鞅 $Z_t = (L * (hat(sigma) - sigma_0))_t$。借鉴 Mitidieri--Pohozaev 检验函数思想 #cite(<mitidieri2001apriori>)，用 $phi(u) = (T - u)^2$ 检验 $dif Z_u$ 可对全体 $H in (0, 1\/2]$ 统一处理，并将负线性项限制在随 $M -> infinity$ 收缩至零的端点边界层 $[T - delta_M, T]$ 内。
-+ *Doléans--Dade 指数上鞅吸收*：选取 $lambda = q \/ (theta.alt^2 T^2)$，将二次变差项 $1/2 lambda^2 chevron.l cal(M) chevron.r_T$ 完全吸收进半数正二次漂移项中，从而在不依赖任何矩假设或 $L log L$ 条件的前提下，获得与 Fatou 引理 $EE_(hat(QQ)_M)[cal(E)_T(-lambda cal(M))] <= 1$ 矛盾的确定性逐轨下界。
++ *Doléans--Dade 指数上鞅吸收*：选取 $lambda = q \/ (theta.alt^2 T^2)$，将二次变差项 $1/2 lambda^2 chevron.l cal(M) chevron.r_T$ 完全吸收进半数正二次漂移项中，从而在不依赖任何矩假设或 $L log L$ 条件的前提下，获得与 Fatou 引理 $EE_(hat(QQ)_M)[cal(E)_T (-lambda cal(M))] <= 1$ 矛盾的确定性逐轨下界。
 
 = 主要结果
 
 #thmblock([定理 1（适用于全体 $H in (0, 1\/2]$ 的统一鞅性必要条件）])[
   设 $(S, sigma)$ 为由 @eq:model 与核函数 @eq:kernel 定义的唯一连续全局非负解，其中 $H in (0, 1\/2]$，$sigma_0 > 0$，$theta > 0$，$kappa_1 >= 0$，$kappa_2 >= 0$，$epsilon.alt >= 0$ 且 $beta in RR$（于是 $c_0 = kappa_1 theta >= 0$；参见 #cite(<sepp2026rough>, form: "prose", supplement: [Theorem 2.2])）。若 $beta > kappa_2$，则
   $
-    EE_QQ[S_T] < S_0, quad forall T > 0.
+    EE_QQ [S_T] < S_0, quad forall T > 0.
   $ <eq:strict-local>
 ]
 
@@ -115,15 +115,15 @@ $ <eq:kernel>
 
 *证明。* 必要性（$kappa_2 >= beta$）由定理 1 在上述全部参数下给出。对于充分性（$kappa_2 >= beta$），#cite(<sepp2026rough>, form: "prose", supplement: [Theorem 4.3]) 在其基本设定 $epsilon.alt > 0$ 下对所有 $H in (0, 1\/2]$ 与 $kappa_1 >= 0$ 证明了该结论（其适定性依据 #cite(<sepp2026rough>, form: "prose", supplement: [Theorem 2.2]) 仅要求 $c_0 = kappa_1 theta >= 0$ 与 $theta.alt >= 0$；在 $H = 1\/2$ 处亦参见 #cite(<sepp2023lognormal>, form: "prose", supplement: [Theorem 3.7])）。在边界 $epsilon.alt = 0$ 处：若 $beta != 0$，则 $theta.alt = abs(beta) > 0$，#cite(<sepp2026rough>, form: "prose", supplement: [Theorem 4.3]) 的证明原封不动适用；若 $beta = epsilon.alt = 0$，则 $theta.alt = 0$，由 #cite(<sepp2026rough>, form: "prose", supplement: [Theorem 2.2]) 知 $sigma$ 为 $[0, T]$ 上的确定性有界函数，故 $S$ 亦为真 $QQ$-鞅。 #h(1fr) $square$
 
-*注（严格正性、初始波动率退化与边界漂移假设）。* 定理 1 并不依赖 $sigma_t$ 的严格正性（#cite(<sepp2026rough>, form: "prose", supplement: [Conjecture 2.3])），仅要求 $sigma_t >= 0$ a.s.，而这一性质已由 #cite(<sepp2026rough>, form: "prose", supplement: [Theorem 2.2]) 建立。需要指出的是，当 $sigma_0 = kappa_1 = 0$（即 $c_0 = 0$）时，平凡解 $sigma equiv 0$ 与 $S equiv S_0$ 在 $beta > kappa_2$ 时仍为真鞅，说明 $sigma_0 > 0$ 与 $c_0 > 0$ 不能同时省略。反之，由于 #cite(<sepp2026rough>, form: "prose", supplement: [Theorem 2.2]) 本身允许 $sigma_0 >= 0$，在 $sigma_0 = 0$ 且 $c_0 = kappa_1 theta > 0$ 下同样存在唯一的连续全局非负强解；此时只要在 @eq:exp-lower（以及定理 3 中的 @eq:general-exp-lower）中保留正常数项 $(c_0 T^3) \/ 3 > 0$，其余论证无需本质改动即可导出同样矛盾。此外，条件 $c_0 >= 0$ 仅为行文便利而非本质限制。若当 $c_0 < 0$ 时存在连续非负解且 $EE_QQ[S_T] = S_0$，则由上鞅性质对所有 $t in (0, T]$ 均有 $EE_QQ[S_t] = S_0$。由于对任意 $alpha in (1\/2, 1]$ 都有 $3 - alpha < 3$，取充分小的 $t in (0, T]$ 即可保证 $2 sigma_0 t^(3 - alpha) \/ Gamma(4 - alpha) + c_0 t^3 \/ 3 > 0$，进而在 $[0, t]$ 上沿用同一证明即可导出矛盾。
+*注（严格正性、初始波动率退化与边界漂移假设）。* 定理 1 并不依赖 $sigma_t$ 的严格正性（#cite(<sepp2026rough>, form: "prose", supplement: [Conjecture 2.3])），仅要求 $sigma_t >= 0$ a.s.，而这一性质已由 #cite(<sepp2026rough>, form: "prose", supplement: [Theorem 2.2]) 建立。需要指出的是，当 $sigma_0 = kappa_1 = 0$（即 $c_0 = 0$）时，平凡解 $sigma equiv 0$ 与 $S equiv S_0$ 在 $beta > kappa_2$ 时仍为真鞅，说明 $sigma_0 > 0$ 与 $c_0 > 0$ 不能同时省略。反之，由于 #cite(<sepp2026rough>, form: "prose", supplement: [Theorem 2.2]) 本身允许 $sigma_0 >= 0$，在 $sigma_0 = 0$ 且 $c_0 = kappa_1 theta > 0$ 下同样存在唯一的连续全局非负强解；此时只要在 @eq:exp-lower（以及定理 3 中的 @eq:general-exp-lower）中保留正常数项 $(c_0 T^3) \/ 3 > 0$，其余论证无需本质改动即可导出同样矛盾。此外，条件 $c_0 >= 0$ 仅为行文便利而非本质限制。若当 $c_0 < 0$ 时存在连续非负解且 $EE_QQ [S_T] = S_0$，则由上鞅性质对所有 $t in (0, T]$ 均有 $EE_QQ [S_t] = S_0$。由于对任意 $alpha in (1\/2, 1]$ 都有 $3 - alpha < 3$，取充分小的 $t in (0, T]$ 即可保证 $2 sigma_0 t^(3 - alpha) \/ Gamma(4 - alpha) + c_0 t^3 \/ 3 > 0$，进而在 $[0, t]$ 上沿用同一证明即可导出矛盾。
 
 = 定理 1 的证明
 
-固定 $H in (0, 1\/2]$，记 $alpha := H + 1\/2 in (1\/2, 1]$ 及 $q := beta - kappa_2 > 0$。由于 $kappa_2 >= 0$，有 $beta > 0$，从而 $theta.alt = sqrt(beta^2 + epsilon.alt^2) >= beta > 0$。反设存在某个 $T > 0$ 使得 $EE_QQ[S_T] = S_0$。
+固定 $H in (0, 1\/2]$，记 $alpha := H + 1\/2 in (1\/2, 1]$ 及 $q := beta - kappa_2 > 0$。由于 $kappa_2 >= 0$，有 $beta > 0$，从而 $theta.alt = sqrt(beta^2 + epsilon.alt^2) >= beta > 0$。反设存在某个 $T > 0$ 使得 $EE_QQ [S_T] = S_0$。
 
 == 第一步：计价单位测度与常漂移 Cameron--Martin 倾斜
 
-由于 $sigma$ 在 $[0, T]$ 上 $QQ$-a.s. 连续，故 $integral_0^T sigma_s^2 dif s < infinity$ $QQ$-a.s.，从而 $S\/S_0 = cal(E)(integral_0^(dot.c) sigma_s dif W_s^((0)))$ 是严格正连续 $QQ$-局部鞅，亦即 $QQ$-上鞅。假设 $EE_QQ[S_T\/S_0] = 1$ 蕴含 $S\/S_0$ 在 $[0, T]$ 上为真 $QQ$-鞅。由此在 $cal(F)_T$ 上定义等价概率测度 $hat(QQ) tilde QQ$，其 Radon--Nikodym 导数为 $dif hat(QQ)\/dif QQ |_(cal(F)_T) := S_T\/S_0$。由 Girsanov 定理，
+由于 $sigma$ 在 $[0, T]$ 上 $QQ$-a.s. 连续，故 $integral_0^T sigma_s^2 dif s < infinity$ $QQ$-a.s.，从而 $S\/S_0 = cal(E)(integral_0^(dot.c) sigma_s dif W_s^((0)))$ 是严格正连续 $QQ$-局部鞅，亦即 $QQ$-上鞅。假设 $EE_QQ [S_T\/S_0] = 1$ 蕴含 $S\/S_0$ 在 $[0, T]$ 上为真 $QQ$-鞅。由此在 $cal(F)_T$ 上定义等价概率测度 $hat(QQ) tilde QQ$，其 Radon--Nikodym 导数为 $dif hat(QQ)\/dif QQ |_(cal(F)_T) := S_T\/S_0$。由 Girsanov 定理，
 $
   hat(B)_t := W_t^sigma - (beta / theta.alt) integral_0^t sigma_s dif s, quad t in [0, T],
 $
@@ -227,7 +227,7 @@ $ <eq:final-bound>
 
 #figure(
   fig-boundary-layer(lang: "zh"),
-  caption: [线性权重 $c_M(u) = A_M (T - u)^2 - 2 (T - u)^(2 - alpha) \/ Gamma(3 - alpha)$ 在 $[0, T]$ 上的分布（取 $T = 1$，$H = 0.25$ 即 $alpha = 0.75$，以及三组漂移强度 $A_M in {2.2, 3.8, 7.0}$）。在主区间 $[0, T - delta_M]$ 上恒有 $c_M(u) >= 0$；阴影所示的端点负层 $[T - delta_M, T]$ 随 $M -> infinity$ 收缩至零。]
+  caption: [线性权重 $c_M (u) = A_M (T - u)^2 - 2 (T - u)^(2 - alpha) \/ Gamma(3 - alpha)$ 在 $[0, T]$ 上的分布（取 $T = 1$，$H = 0.25$ 即 $alpha = 0.75$，以及三组漂移强度 $A_M in {2.2, 3.8, 7.0}$）。在主区间 $[0, T - delta_M]$ 上恒有 $c_M (u) >= 0$；阴影所示的端点负层 $[T - delta_M, T]$ 随 $M -> infinity$ 收缩至零。]
 ) <fig:boundary-layer>
 
 在经典扩散端点 $H = 1\/2$（$alpha = 1$）处，@eq:final-bound 简化为
@@ -238,7 +238,7 @@ $
 $
   1 < e^(epsilon.alt_0) <= EE_(hat(QQ)_M)[ exp( -lambda cal(M)_T - 1/2 lambda^2 chevron.l cal(M) chevron.r_T ) ] <= 1,
 $
-矛盾。因此对任意 $T > 0$ 必有 $EE_QQ[S_T] < S_0$。 #h(1fr) $square$
+矛盾。因此对任意 $T > 0$ 必有 $EE_QQ [S_T] < S_0$。 #h(1fr) $square$
 
 = 一般完全单调核
 
@@ -262,7 +262,7 @@ $ <eq:W2-def>
        $
          "Tail"(delta) := integral_(T - delta)^T (W_2(s)^2) / (2 q (T - s)^2) dif s <= (2 L([0, delta])^2 delta) / q -> 0 quad ("当 " delta arrow.b 0).
        $
-  2. 因此，贴现远期价格 $S$ 在 $[0, T]$ 上为严格局部鞅：$EE_QQ[S_T] < S_0$。
+  2. 因此，贴现远期价格 $S$ 在 $[0, T]$ 上为严格局部鞅：$EE_QQ [S_T] < S_0$。
 ]
 
 *证明。* 我们先由 $L >= 0$ 与 $L([0, T]) < infinity$ 直接验证性质 (i)--(iii)。
@@ -282,7 +282,7 @@ $ <eq:W2-def>
   $
   这里用到了 $L([0, delta]) <= L([0, T]) < infinity$。
 
-接下来用反证法证明 $EE_QQ[S_T] < S_0$。反设 $EE_QQ[S_T] = S_0$。逐字沿用第 3 节第一步，对任意使 $A_M := c_1 + theta.alt M > 0$ 的常数 $M > 0$，均可构造等价概率测度 $hat(QQ)_M tilde QQ$ 及标准 $hat(QQ)_M$-布朗运动 $hat(B)^M$，使得 $hat(sigma)$ 在 $[0, T]$ 上连续非负且满足 $hat(sigma) - sigma_0 = K * dif Z$，其中 $Z$ 由 式 8 给出。
+接下来用反证法证明 $EE_QQ [S_T] < S_0$。反设 $EE_QQ [S_T] = S_0$。逐字沿用第 3 节第一步，对任意使 $A_M := c_1 + theta.alt M > 0$ 的常数 $M > 0$，均可构造等价概率测度 $hat(QQ)_M tilde QQ$ 及标准 $hat(QQ)_M$-布朗运动 $hat(B)^M$，使得 $hat(sigma)$ 在 $[0, T]$ 上连续非负且满足 $hat(sigma) - sigma_0 = K * dif Z$，其中 $Z$ 由 式 8 给出。
 
 因 $K in L^2([0, T])$ 且 $L$ 为 $[0, T]$ 上满足 $K * L equiv 1$ 的非负有限测度，第 3.2 节基于停时 $tau_n = inf{ t in [0, T] : hat(sigma)_t >= n } and T$、取 $X^((n)) := (K * dif Z^(tau_n))$ 联合可测修正、#cite(<abijaber2019affine>, form: "prose", supplement: [Lemma 2.6])、乘积空间 Tonelli 定理以及由 $hat(sigma)_0 - sigma_0 = 0$ 与控制收敛定理得到的连续性论证原封不动地成立，给出 $hat(QQ)_M$-a.s. 逐轨反演 $Z_t = integral_([0, t]) (hat(sigma)_(t - r) - sigma_0) L(dif r)$（$forall t in [0, T]$）。用检验函数 $phi(u) = (T - u)^2$ 分部积分得 $integral_0^T (T - u)^2 dif Z_u = 2 integral_0^T (T - u) Z_u dif u$。应用 Fubini 定理（由 $hat(sigma)$ 在 $[0, T]$ 上连续及 $L([0, T]) < infinity$ 保证逐轨成立）并作变量替换 $s = u - r$：
 $
@@ -306,12 +306,12 @@ $ <eq:general-exp-lower>
 $
   -lambda cal(M)_T - 1/2 lambda^2 chevron.l cal(M) chevron.r_T >= lambda ( sigma_0 I_0(T) - "Tail"(delta) ) >= 1/2 lambda sigma_0 I_0(T) =: epsilon.alt_0 > 0, quad hat(QQ)_M"-a.s."
 $
-两边取指数并在 @eq:fatou 中取期望得 $1 < e^(epsilon.alt_0) <= 1$，矛盾。因此 $EE_QQ[S_T] < S_0$。 #h(1fr) $square$
+两边取指数并在 @eq:fatou 中取期望得 $1 < e^(epsilon.alt_0) <= 1$，矛盾。因此 $EE_QQ [S_T] < S_0$。 #h(1fr) $square$
 
 回顾核函数 $K : (0, infinity) -> [0, infinity)$ 称为*完全单调（completely monotone）*，若其在 $(0, infinity)$ 上 $C^infinity$ 光滑且对所有 $t > 0$ 与 $k >= 0$ 满足 $(-1)^k K^((k))(t) >= 0$。由 #cite(<gripenberg1990volterra>, form: "prose", supplement: [Theorem 5.5.4]) 的经典定理，任意非零完全单调核 $K in L^1_"loc"(RR_+)$ 在任意 $[0, T]$ 上均存在唯一的非负第一类预解核 $L$ 且满足 $L([0, T]) < infinity$。因此定理 3 直接推得：
 
 #thmblock("推论 4（全体非零完全单调 L² 核）")[
-  设 $K in L^2_"loc"(RR_+)$ 为任意非零完全单调核，并设 @eq:model 存在连续全局非负解 $(S, sigma)$，满足 $sigma_0 > 0$、$theta > 0$、$kappa_1 >= 0$、$kappa_2 >= 0$、$epsilon.alt >= 0$ 及 $beta > kappa_2$。则对任意 $T > 0$ 均有 $EE_QQ[S_T] < S_0$。
+  设 $K in L^2_"loc"(RR_+)$ 为任意非零完全单调核，并设 @eq:model 存在连续全局非负解 $(S, sigma)$，满足 $sigma_0 > 0$、$theta > 0$、$kappa_1 >= 0$、$kappa_2 >= 0$、$epsilon.alt >= 0$ 及 $beta > kappa_2$。则对任意 $T > 0$ 均有 $EE_QQ [S_T] < S_0$。
 ]
 
 == 金融波动率典型核族的显式验证
@@ -338,10 +338,14 @@ $ <eq:W2-gamma>
 
 *例 2（有限与无限指数混合核；多尺度粗糙核）。* 由 Bernstein 定理，任意非零完全单调核均具有 Laplace 表示
 $
-  K_mu(t) = integral_([0, infinity)) e^(-x t) mu(dif x),
+  K_mu (t) = integral_([0, infinity)) e^(-x t) mu(dif x),
 $
-其中 $mu$ 为 $[0, infinity)$ 上的非零非负 Radon 测度。条件 $K_mu in L^2_"loc"(RR_+)$ 等价于 $integral_([0, infinity)) (1 + x)^(-1\/2) mu(dif x) < infinity$，在此条件下推论 4 直接适用：
-- *有限指数和核（Markov 升维近似）*：取 $mu = sum_(i=1)^N w_i delta_(x_i)$（$w_i > 0, x_i >= 0$）即得 $K^N(t) = sum_(i=1)^N w_i e^(-x_i t)$。以单因子指数核 $K(t) = w e^(-x t)$ 为例，其第一类预解核具有显式公式 $L(dif r) = w^(-1) delta_0(dif r) + (x \/ w) dif r$，由此算得
+其中 $mu$ 为 $[0, infinity)$ 上的非零非负 Radon 测度。由 Tonelli 定理，$integral_0^T K_mu (t)^2 dif t = integral.double_([0, infinity)^2) (1 - e^(-(x + y) T)) / (x + y) mu(dif x) mu(dif y)$，故 $K_mu in L^2_"loc"(RR_+)$ 当且仅当
+$
+  integral.double_([0, infinity)^2) 1 / (1 + x + y) mu(dif x) mu(dif y) < infinity,
+$ <eq:bernstein-L2>
+而更易检验的单重积分条件 $integral_([0, infinity)) (1 + x)^(-1\/2) mu(dif x) < infinity$ 是其充分条件（因 $1 + x + y >= sqrt((1 + x)(1 + y))$）。只要 @eq:bernstein-L2 成立，推论 4 即直接适用：
+- *有限指数和核（Markov 升维近似）*：取 $mu = sum_(i=1)^N w_i delta_(x_i)$（$w_i > 0, x_i >= 0$）即得 $K^N (t) = sum_(i=1)^N w_i e^(-x_i t)$。以单因子指数核 $K(t) = w e^(-x t)$ 为例，其第一类预解核具有显式公式 $L(dif r) = w^(-1) delta_0(dif r) + (x \/ w) dif r$，由此算得
   $
     W_2(s) = (2 (T - s) + x (T - s)^2) / w, quad I_0(T) = T^2 / w + (x T^3) / (3 w),
   $
@@ -350,7 +354,7 @@ $
     "Tail"(delta_M) = 1 / (2 q w^2) ( 4 delta_M + 2 x delta_M^2 + (x^2 delta_M^3) / 3 ).
   $
   对一般 $N >= 1$，推论 4 无需借助高维 Itô 扩散爆炸检验即可直接涵盖 #cite(<sepp2026rough>, form: "prose", supplement: [Proposition 4.4])。
-- *无限混合与多尺度粗糙核*：只要 $mu([0, infinity)) = infinity$ 且 $integral_([0, infinity)) (1 + x)^(-1\/2) mu(dif x) < infinity$，核函数就满足 $K_mu(0) = infinity$ 且 $K_mu in L^2([0, T])$。这涵盖用于同时拟合短期限偏度与长期限期限结构的双尺度分数阶核 $K(t) = w_1 t^(alpha_1 - 1)\/Gamma(alpha_1) + w_2 t^(alpha_2 - 1)\/Gamma(alpha_2)$（$1\/2 < alpha_1 < alpha_2 <= 1, w_1, w_2 > 0$）。即使此时 $L$ 不存在初等闭式表达式，推论 4 仍可无条件给出 $EE_QQ[S_T] < S_0$。
+- *无限混合与多尺度粗糙核*：只要 $mu([0, infinity)) = infinity$ 且满足 @eq:bernstein-L2（例如 $integral_([0, infinity)) (1 + x)^(-1\/2) mu(dif x) < infinity$），核函数就满足 $K_mu (0) = infinity$ 且 $K_mu in L^2([0, T])$。这涵盖用于同时拟合短期限偏度与长期限期限结构的双尺度分数阶核 $K(t) = w_1 t^(alpha_1 - 1)\/Gamma(alpha_1) + w_2 t^(alpha_2 - 1)\/Gamma(alpha_2)$（$1\/2 < alpha_1 < alpha_2 <= 1, w_1, w_2 > 0$）。即使此时 $L$ 不存在初等闭式表达式，推论 4 仍可无条件给出 $EE_QQ [S_T] < S_0$。
 
 *例 3（平移幂律核）。* 正则化幂律核
 $
@@ -374,7 +378,7 @@ $
     [Sepp & Rakhmonov #cite(<sepp2023lognormal>)], [常核（$H = 1\/2$）], [一维 Feller 爆炸检验], [Markov 扩散过程；Itô 生成元],
     [Bondi & Pulido #cite(<bondi2026feller>)], [非奇异核（$K(0) < infinity$，$K in W^(1,1)$）及有限和核 $K^N$], [半鞅 Feller / Khasminskii 检验], [半鞅状态或 $N$ 维 Markov 升维],
     [Guyon et al. #cite(<guyon2026martingale>)], [光滑核（充分性条件允许粗糙核）], [光滑 Volterra SDE 爆炸判据], [光滑核 $K$；增长假设 1.2 在 $kappa_2 > 0$ 时不满足],
-    [Sepp & Rakhmonov #cite(<sepp2026rough>, supplement: [Prop. 4.4])], [正权重有限指数和核 $K^N$], [借助 #cite(<bondi2026feller>) 作微分归约], [$K^N(0) < infinity$],
+    [Sepp & Rakhmonov #cite(<sepp2026rough>, supplement: [Prop. 4.4])], [正权重有限指数和核 $K^N$], [借助 #cite(<bondi2026feller>) 作微分归约], [$K^N (0) < infinity$],
     [*本文（定理 3 / 推论 4）*], [*全体非零完全单调 $K in L^2$（兼顾 $K(0) < infinity$ 与 $K(0) = infinity$）*], [*第一类预解核 + 二次检验函数 + Cameron--Martin 倾斜 + Doléans--Dade 上鞅*], [*仅需 $sigma_t >= 0$ a.s. 与有限非负 $L >= 0$；无需半鞅、严格正性或 $L log L$*],
   ),
   caption: [对数正态 Volterra 随机波动率模型鞅性必要条件（严格局部鞅）判据的对比。]
@@ -434,6 +438,8 @@ $
 由 @tbl:general-kernels 可见，引入指数阻尼（$eta > 0$ 或 $x > 0$）会为第一类预解核 $L$ 带来一个非负的积分增量项，从而严格增大全局质量 $I_0(T)$（即增大 $"LHS"$），同时对窄边界层 $[T - delta_M, T]$ 仅产生 $O(eta delta_M)$ 阶的高阶影响，进而严格拓宽矛盾净余量。
 
 *遗留公开问题。* 本文在分数阶核及全体非零完全单调 $L^2$ 核下证明了猜想 4.5（鞅性必要条件），但并未涉及 $H < 1\/2$ 时 $sigma_t$ 的几乎必然严格正性（#cite(<sepp2026rough>, form: "prose", supplement: [Conjecture 2.3])）以及二次漂移下的平稳分布问题，这两者目前仍处于开放状态。
+
+*代码公开与 Lean 4 形式化验证。* 本文的 Typst 源码、绘图脚本与 Lean 4 形式化证明（`RoughLogSVConjecture45.lean`，基于 Lean `v4.36.0` / Mathlib `v4.36.0`，零 `sorry`）已公开于 #link("https://github.com/HYwooo/rough-logsv-conjecture45")[github.com/HYwooo/rough-logsv-conjecture45]。由于 Mathlib4 尚未覆盖连续时间随机微积分（Girsanov 测度变换、局部化随机 Fubini 定理、Itô 分部积分与 Doléans--Dade 上鞅），形式化工程采用三层架构：对全部确定性实分析、Beta/Gamma 积分及测度论估计（Layer 1）与给定显式随机微积分前置接口假设（Layer 2）下定理 1、定理 3 的端到端反证归约（Layer 3）提供机器验证，并附带内部一致性（非空性）检验。
 
 *致谢与人工智能工具使用说明。* 作者感谢 Google 开发的大语言模型 Gemini 4 Neon #cite(<google2026gemini>) 在证明梳理、Typst 排版及 Lean 4 形式化过程中提供的辅助支持。
 
