@@ -1,0 +1,6 @@
+name = "RoughLogSVConjecture45"
+version = "0.1.0"
+defaultTargets = ["RoughLogSVConjecture45"]
+
+[[lean_lib]]
+name = "RoughLogSVConjecture45"
